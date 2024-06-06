@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.NoteList" parent="android:Theme.Material.Light.NoActionBar" >
+        <item name="android:windowSplashScreenBackground" tools:ignore="NewApi">#0D0D0E</item>
+        <!-- Use windowSplashScreenAnimatedIcon to add a drawable or an animated
+             drawable. One of these is required. -->
+        <item name="android:windowSplashScreenAnimatedIcon" tools:ignore="NewApi">@mipmap/ic_launcher</item>
+        <!-- Required for animated icons. -->
+        <item name="android:windowSplashScreenAnimationDuration" tools:ignore="NewApi">200</item>
+        <item name="android:windowSplashScreenBehavior" tools:ignore="NewApi">icon_preferred</item>
+<!--        <item name="android:windowLayoutInDisplayCutoutMode" tools:ignore="NewApi">shortEdges</item>-->
+    </style>
+</resources>
