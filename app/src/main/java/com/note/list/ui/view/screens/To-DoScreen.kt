@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -164,6 +165,7 @@ fun ToDoListScreen(
         toDoListData.onSuccess { toDoList ->
             Column (  modifier = Modifier
                 .fillMaxSize()
+                .navigationBarsPadding()
                 .padding(
                     top = paddingValues.calculateTopPadding(),
                     bottom = paddingValues.calculateBottomPadding(),
@@ -189,6 +191,7 @@ fun ToDoListScreen(
         LazyColumn(
             Modifier
                 .fillMaxSize()
+                .navigationBarsPadding()
                 .animateContentSize()
                 .padding(
                     top = paddingValues.calculateTopPadding(),

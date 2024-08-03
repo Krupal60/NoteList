@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -38,87 +37,74 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import com.note.list.domain.note.Note
 import com.note.list.viewmodel.NoteViewModel
 
 @Composable
 fun NoteScreenMain(
-    navController: NavHostController,
+    onItemClick: (Int) -> Unit,
+    onFabClick: (Int) -> Unit,
     viewModel: NoteViewModel = hiltViewModel()
 ) {
     val notes =
         viewModel.notes.collectAsStateWithLifecycle(initialValue = Result.success(emptyList()))
-    NoteScreen(notes,
-        onFloatButtonClick = {
-            navController.navigate(Screen.Upsert.route + "/0") {
-                launchSingleTop = true
-                restoreState = true
-                popUpTo(Screen.NoteScreen.route)
-            }
-        }, onItemClick = { id ->
-            navController.navigate(Screen.Upsert.route + "/$id") {
-                launchSingleTop = true
-                restoreState = true
-                popUpTo(Screen.NoteScreen.route)
-            }
-        }
-    )
+    NoteScreen(notes, onFloatButtonClick = {
+        onFabClick(0)
+    }, onItemClick = { id ->
+        onItemClick(id)
+    })
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun NoteScreen(
-    notes: State<Result<List<Note>>>,
-    onFloatButtonClick: () -> Unit,
-    onItemClick: (Int) -> Unit
+    notes: State<Result<List<Note>>>, onFloatButtonClick: () -> Unit, onItemClick: (Int) -> Unit
 ) {
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize(),
-        topBar = {
-            TopAppBar(title = {
-                Text(
-                    text = "Notes",
-                    modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 10.dp),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            })
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                modifier = Modifier.padding(bottom = 12.dp, end = 5.dp),
-                shape = CircleShape,
-                onClick = {
-                    onFloatButtonClick()
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "Add Note"
-                )
-            }
+    Scaffold(modifier = Modifier
+        .navigationBarsPadding()
+        .fillMaxSize()
+       , topBar = {
+        TopAppBar(title = {
+            Text(
+                text = "Notes",
+                modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 10.dp),
+                style = MaterialTheme.typography.titleLarge
+            )
+        })
+    }, floatingActionButton = {
+        FloatingActionButton(modifier = Modifier.padding(bottom = 12.dp, end = 5.dp),
+            shape = CircleShape,
+            onClick = {
+                onFloatButtonClick()
+            }) {
+            Icon(
+                imageVector = Icons.Filled.Add, contentDescription = "Add Note"
+            )
         }
+    }
 
     ) { paddingValues ->
         val notesData = notes.value
         notesData.onSuccess { notes ->
-            Column (  modifier = Modifier
-                .fillMaxSize()
-                .padding(
-                    top = paddingValues.calculateTopPadding(),
-                    bottom = paddingValues.calculateBottomPadding(),
-                    start = 14.dp, end = 14.dp
-                ),
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        bottom = paddingValues.calculateBottomPadding(),
+                        start = 14.dp,
+                        end = 14.dp
+                    ),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceAround){
+                verticalArrangement = Arrangement.SpaceAround
+            ) {
                 if (notes.isEmpty()) {
-                        Text(
-                            modifier = Modifier
-                                .padding(horizontal = 14.dp, vertical = 24.dp),
-                            textAlign = TextAlign.Center, text = "Nothing Here , Create New Note..",
-                            style = MaterialTheme.typography.headlineSmall
-                        )
+                    Text(
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 24.dp),
+                        textAlign = TextAlign.Center,
+                        text = "Nothing Here , Create New Note..",
+                        style = MaterialTheme.typography.headlineSmall
+                    )
 
                 }
             }
@@ -131,23 +117,21 @@ fun NoteScreen(
                     .padding(
                         top = paddingValues.calculateTopPadding(),
                         bottom = paddingValues.calculateBottomPadding(),
-                        start = 14.dp, end = 14.dp
+                        start = 14.dp,
+                        end = 14.dp
                     ),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalItemSpacing = 10.dp,
             ) {
 
                 items(notes) { note ->
-                    ElevatedCard(
-                        modifier = Modifier.animateItemPlacement(
-                            animationSpec = tween(
-                                durationMillis = 300
-                            )
-                        ),
-                        shape = RoundedCornerShape(10.dp),
-                        onClick = {
-                            onItemClick(note.id)
-                        }) {
+                    ElevatedCard(modifier = Modifier.animateItemPlacement(
+                        animationSpec = tween(
+                            durationMillis = 300
+                        )
+                    ), shape = RoundedCornerShape(10.dp), onClick = {
+                        onItemClick(note.id)
+                    }) {
 
                         Column(
                             modifier = Modifier.padding(vertical = 10.dp, horizontal = 12.dp),
@@ -162,8 +146,7 @@ fun NoteScreen(
                                     fontWeight = FontWeight.SemiBold,
                                     fontFamily = FontFamily.Serif,
                                     style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth()
 
                                 )
                                 Spacer(modifier = Modifier.padding(vertical = 8.dp))
@@ -177,8 +160,7 @@ fun NoteScreen(
                                     fontFamily = FontFamily.Serif,
                                     overflow = TextOverflow.Ellipsis,
                                     maxLines = 10,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth()
 
                                 )
                             }
