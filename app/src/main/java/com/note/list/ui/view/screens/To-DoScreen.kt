@@ -160,6 +160,7 @@ fun ToDoListScreen(
 
     ) { paddingValues ->
         val toDoListData = toDoList.value
+        val toDoListDone = toDoListDone.value
 
 
         toDoListData.onSuccess { toDoList ->
@@ -173,7 +174,8 @@ fun ToDoListScreen(
                 ),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceAround){
-                if (toDoList.isEmpty()) {
+
+                if (toDoList.isEmpty() && toDoListDone.getOrNull().isNullOrEmpty()) {
 
                         Text(
                             modifier = Modifier
@@ -204,7 +206,7 @@ fun ToDoListScreen(
 
             toDoListData.onSuccess { toDoList ->
 
-                items(toDoList) { todo ->
+                items(toDoList, key ={it.id} ) { todo ->
                     ElevatedCard(
                         modifier = Modifier.animateItemPlacement(
                             animationSpec = tween(
@@ -220,14 +222,13 @@ fun ToDoListScreen(
                 }
             }
 
-            val toDoListDoneData = toDoListDone.value
-            toDoListDoneData.onSuccess { toDoListDone ->
+            toDoListDone.onSuccess { toDoListDone ->
                 item {
                     AnimatedVisibility(visible = toDoListDone.isNotEmpty()) {
                         Text(text = "Completed", modifier = Modifier.padding(vertical = 10.dp))
                     }
                 }
-                items(toDoListDone) { todo ->
+                items(toDoListDone, key ={it.id}) { todo ->
 
                     ElevatedCard(
                         modifier = Modifier.animateItemPlacement(

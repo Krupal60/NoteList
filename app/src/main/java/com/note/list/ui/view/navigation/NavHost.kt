@@ -56,7 +56,7 @@ fun NavHost(
             )
         }) {
         composable(Screen.NoteScreen.route) {
-            NoteScreenMain( onItemClick = {onItemClick(it)},onFabClick = {onFabClick(it)})
+            NoteScreenMain( onItemClick = onItemClick::invoke,onFabClick =onFabClick::invoke)
         }
         composable(Screen.ToDoList.route) {
             ToDoListScreenMain()

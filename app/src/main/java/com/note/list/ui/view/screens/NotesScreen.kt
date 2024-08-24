@@ -111,7 +111,7 @@ fun NoteScreen(
         }
         notesData.onSuccess { notes ->
             LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Fixed(2),
+                columns = StaggeredGridCells.Adaptive(176.dp),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(
@@ -124,7 +124,7 @@ fun NoteScreen(
                 verticalItemSpacing = 10.dp,
             ) {
 
-                items(notes) { note ->
+                items(notes, key ={it.id}) { note ->
                     ElevatedCard(modifier = Modifier.animateItemPlacement(
                         animationSpec = tween(
                             durationMillis = 300
