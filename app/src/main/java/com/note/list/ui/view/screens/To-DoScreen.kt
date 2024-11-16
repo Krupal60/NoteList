@@ -4,11 +4,15 @@ package com.note.list.ui.view.screens
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -19,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -30,11 +35,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,6 +51,7 @@ import com.note.list.domain.todo.ToDo
 import com.note.list.ui.view.components.ToDoList
 import com.note.list.viewmodel.ToDoListViewModel
 
+@Stable
 data class ToDoState(
     val description: String = "",
     val lastUpdated: Long = 0L,
@@ -71,7 +80,7 @@ fun ToDoListScreen(
 ) {
     val context = LocalContext.current
 
-    AnimatedVisibility(state.value.showDialog) {
+    if (state.value.showDialog) {
         AlertDialog(
             onDismissRequest = {
                 onAction(OnToDoAction.HideDialog)
@@ -86,7 +95,7 @@ fun ToDoListScreen(
                     }
                 }
                 ) {
-                    Text(text = "Save")
+                    Text(text = if (state.value.id == 0) "Save" else "Update")
                 }
 
             },
@@ -104,16 +113,7 @@ fun ToDoListScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(text = "TO-Do List")
-//                    IconButton(
-//                        onClick = {
-//
-//                        }
-//                    ) {
-//                        Icon(
-//                            imageVector = Icons.Filled.Timer,
-//                            contentDescription = "Timer"
-//                        )
-//                    }
+
                 }
             },
             text = {
@@ -162,29 +162,34 @@ fun ToDoListScreen(
         val toDoListData = toDoList.value
         val toDoListDone = toDoListDone.value
 
-
+        val layoutDirection = LocalLayoutDirection.current
+        val displayCutout = WindowInsets.displayCutout.asPaddingValues()
+        val startPadding = displayCutout.calculateStartPadding(layoutDirection)
+        val endPadding = displayCutout.calculateEndPadding(layoutDirection)
         toDoListData.onSuccess { toDoList ->
-            Column (  modifier = Modifier
-                .fillMaxSize()
-                .navigationBarsPadding()
-                .padding(
-                    top = paddingValues.calculateTopPadding(),
-                    bottom = paddingValues.calculateBottomPadding(),
-                    start = 14.dp, end = 14.dp
-                ),
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .navigationBarsPadding()
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        bottom = paddingValues.calculateBottomPadding(),
+                        start = startPadding.coerceAtLeast(14.dp),
+                        end = endPadding.coerceAtLeast(14.dp)
+                    ),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceAround){
+                verticalArrangement = Arrangement.SpaceAround
+            ) {
 
-                if (toDoList.isEmpty() && toDoListDone.getOrNull().isNullOrEmpty()) {
-
-                        Text(
-                            modifier = Modifier
-                                .padding(horizontal = 14.dp, vertical = 24.dp),
-                            textAlign = TextAlign.Center,
-                            text = "Nothing Here , Create New To-Do List..",
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                    }
+                AnimatedVisibility(toDoList.isEmpty() && toDoListDone.getOrNull().isNullOrEmpty()) {
+                    Text(
+                        modifier = Modifier
+                            .padding(horizontal = 14.dp, vertical = 24.dp),
+                        textAlign = TextAlign.Center,
+                        text = "Nothing Here , Create New To-Do List..",
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                }
 
             }
         }
@@ -198,23 +203,28 @@ fun ToDoListScreen(
                 .padding(
                     top = paddingValues.calculateTopPadding(),
                     bottom = paddingValues.calculateBottomPadding(),
-                    start = 14.dp,
-                    end = 14.dp
+                    start = startPadding.coerceAtLeast(14.dp),
+                    end = endPadding.coerceAtLeast(14.dp)
                 ), horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
 
             toDoListData.onSuccess { toDoList ->
 
-                items(toDoList, key ={it.id} ) { todo ->
+                items(toDoList, key = { "todo_${it.id}" }) { todo ->
                     ElevatedCard(
-                        modifier = Modifier.animateItemPlacement(
-                            animationSpec = tween(
-                                durationMillis = 300
-                            )
+                        modifier = Modifier.animateItem(),
+                        elevation = CardDefaults.elevatedCardElevation(
+                            10.dp,
+                            10.dp,
+                            10.dp,
+                            10.dp,
+                            10.dp,
+                            10.dp
                         ),
                         onClick = {
                             onAction(OnToDoAction.GetData(todo.id))
+                            onAction(OnToDoAction.Edit(todo.id))
                             onAction(OnToDoAction.ShowDialog)
                         }) {
                         ToDoList(todo, onAction)
@@ -228,14 +238,17 @@ fun ToDoListScreen(
                         Text(text = "Completed", modifier = Modifier.padding(vertical = 10.dp))
                     }
                 }
-                items(toDoListDone, key ={it.id}) { todo ->
-
+                items(toDoListDone, key = { "done_${it.id}" }) { todo ->
                     ElevatedCard(
-                        modifier = Modifier.animateItemPlacement(
-                            animationSpec = tween(
-                                durationMillis = 300
-                            )
-                        )
+                        elevation = CardDefaults.elevatedCardElevation(
+                            10.dp,
+                            10.dp,
+                            10.dp,
+                            10.dp,
+                            10.dp,
+                            10.dp
+                        ),
+                        modifier = Modifier.animateItem()
                     ) {
                         ToDoList(todo, onAction)
                     }

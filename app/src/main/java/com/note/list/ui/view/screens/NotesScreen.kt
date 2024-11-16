@@ -1,11 +1,15 @@
 package com.note.list.ui.view.screens
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -17,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -29,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -62,8 +68,7 @@ fun NoteScreen(
 ) {
     Scaffold(modifier = Modifier
         .navigationBarsPadding()
-        .fillMaxSize()
-       , topBar = {
+        .fillMaxSize(), topBar = {
         TopAppBar(title = {
             Text(
                 text = "Notes",
@@ -85,6 +90,10 @@ fun NoteScreen(
 
     ) { paddingValues ->
         val notesData = notes.value
+        val layoutDirection = LocalLayoutDirection.current
+        val displayCutout = WindowInsets.displayCutout.asPaddingValues()
+        val startPadding = displayCutout.calculateStartPadding(layoutDirection)
+        val endPadding = displayCutout.calculateEndPadding(layoutDirection)
         notesData.onSuccess { notes ->
             Column(
                 modifier = Modifier
@@ -92,13 +101,13 @@ fun NoteScreen(
                     .padding(
                         top = paddingValues.calculateTopPadding(),
                         bottom = paddingValues.calculateBottomPadding(),
-                        start = 14.dp,
-                        end = 14.dp
+                        start = startPadding.coerceAtLeast(14.dp),
+                        end = endPadding.coerceAtLeast(14.dp)
                     ),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceAround
             ) {
-                if (notes.isEmpty()) {
+                AnimatedVisibility(notes.isEmpty()) {
                     Text(
                         modifier = Modifier.padding(horizontal = 14.dp, vertical = 24.dp),
                         textAlign = TextAlign.Center,
@@ -111,27 +120,34 @@ fun NoteScreen(
         }
         notesData.onSuccess { notes ->
             LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Adaptive(176.dp),
+                columns = StaggeredGridCells.Fixed(2),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(
                         top = paddingValues.calculateTopPadding(),
                         bottom = paddingValues.calculateBottomPadding(),
-                        start = 14.dp,
-                        end = 14.dp
+                        start = startPadding.coerceAtLeast(14.dp),
+                        end = endPadding.coerceAtLeast(14.dp)
                     ),
+
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalItemSpacing = 10.dp,
             ) {
 
-                items(notes, key ={it.id}) { note ->
-                    ElevatedCard(modifier = Modifier.animateItemPlacement(
-                        animationSpec = tween(
-                            durationMillis = 300
-                        )
-                    ), shape = RoundedCornerShape(10.dp), onClick = {
-                        onItemClick(note.id)
-                    }) {
+                items(notes, key = { it.id }) { note ->
+                    ElevatedCard(modifier = Modifier.animateItem(),
+                        shape = RoundedCornerShape(10.dp),
+                        elevation = CardDefaults.elevatedCardElevation(
+                            10.dp,
+                            10.dp,
+                            10.dp,
+                            10.dp,
+                            10.dp,
+                            10.dp
+                        ),
+                        onClick = {
+                            onItemClick(note.id)
+                        }) {
 
                         Column(
                             modifier = Modifier.padding(vertical = 10.dp, horizontal = 12.dp),

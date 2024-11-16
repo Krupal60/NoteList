@@ -9,14 +9,14 @@ plugins {
 
 android {
     namespace = "com.note.list"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.note.list"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 5
-        versionName = "1.5"
+        targetSdk = 35
+        versionCode = 7
+        versionName = "1.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -27,10 +27,10 @@ android {
             schemaDirectory("$projectDir/schemas")
         }
 
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
-            // other options...
-        }
+//        ksp {
+//            arg("room.schemaLocation", "$projectDir/schemas")
+//            // other options...
+//        }
 
     }
 
@@ -56,11 +56,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "21"
     }
     buildFeatures {
         compose = true
@@ -116,7 +116,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
 
     //text editer
-    implementation(libs.richeditor.compose)
+//    implementation(libs.richeditor.compose)
 
     implementation(libs.androidx.core.splashscreen)
 

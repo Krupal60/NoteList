@@ -28,7 +28,12 @@ class ToDoListViewModel @Inject constructor(private val repository: ToDoListRepo
             is OnToDoAction.UpdateDescription -> updateDescription(onToDoAction.description)
             is OnToDoAction.GetData -> getData(onToDoAction.id)
             is OnToDoAction.Delete -> delete(onToDoAction.toDo)
-            is OnToDoAction.IsDone -> isDone(onToDoAction.id,onToDoAction.isDone,onToDoAction.description)
+            is OnToDoAction.IsDone -> isDone(
+                onToDoAction.id,
+                onToDoAction.isDone,
+                onToDoAction.description
+            )
+
             is OnToDoAction.Edit -> edit(onToDoAction.id)
             OnToDoAction.ShowDialog -> showDialog()
             OnToDoAction.HideDialog -> hideDialog()
@@ -68,74 +73,75 @@ class ToDoListViewModel @Inject constructor(private val repository: ToDoListRepo
     }
 
 
-
-
-private fun delete(todo: ToDo) {
-    viewModelScope.launch {
-        repository.delete(
-           todo
+    private fun delete(todo: ToDo) {
+        viewModelScope.launch {
+            repository.delete(
+                todo
+            )
+        }
+        state.value = state.value.copy(
+            description = "",
+            lastUpdated = 0L,
+            isDone = false,
+            showDialog = false,
+            id = 0
         )
     }
-    state.value = state.value.copy(
-        description = "",
-        lastUpdated = 0L,
-        isDone = false,
-        showDialog = false,
-        id = 0
-    )
-}
 
-private fun getData(id: Int) {
-    viewModelScope.launch {
-        repository.getToDoListDetail(id).collect { result ->
-            result.onSuccess {
-                state.value =
-                    state.value.copy(
-                        description = it.description,
-                        lastUpdated = it.lastUpdated,
-                        isDone = it.isDone,
+    private fun getData(id: Int) {
+        viewModelScope.launch {
+            val it = repository.getToDoListDetail(id)
+            state.value =
+                state.value.copy(
+                    description = it.description,
+                    lastUpdated = it.lastUpdated,
+                    isDone = it.isDone,
+                )
+        }
+    }
+
+    private fun updateDescription(description: String) {
+        state.value = state.value.copy(
+            description = description,
+            lastUpdated = System.currentTimeMillis()
+        )
+    }
+
+    private fun upsertData() {
+        if (state.value.description.isNotBlank() && state.value.id == 0) {
+            viewModelScope.launch {
+                repository.upsert(
+                    ToDo(
+                        state.value.description,
+                        System.currentTimeMillis(),
+                        isDone = false
                     )
+                )
             }
+            return
         }
-    }
-}
-
-private fun updateDescription(description: String) {
-    state.value = state.value.copy(
-        description = description,
-        lastUpdated = System.currentTimeMillis()
-    )
-}
-
-private fun upsertData() {
-    if (state.value.description.isNotBlank() && state.value.id == 0) {
-        viewModelScope.launch {
-            repository.upsert(
-                ToDo(
-                    state.value.description,
-                    System.currentTimeMillis(),
-                    isDone = false
+        if (state.value.description.isNotBlank() && state.value.id != 0) {
+            viewModelScope.launch {
+                repository.upsert(
+                    ToDo(
+                        state.value.description,
+                        System.currentTimeMillis(),
+                        isDone = state.value.isDone,
+                        id = state.value.id
+                    )
                 )
+            }
+            state.value = state.value.copy(
+                description = "",
+                lastUpdated = 0L,
+                isDone = false,
+                showDialog = false,
+                id = 0
             )
+            return
         }
-        return
-    }
-    if (state.value.description.isNotBlank() && state.value.id != 0) {
-        viewModelScope.launch {
-            repository.upsert(
-                ToDo(
-                    state.value.description,
-                    System.currentTimeMillis(),
-                    isDone = state.value.isDone,
-                    id = state.value.id
-                )
-            )
-        }
-        state.value = state.value.copy(showDialog = false)
-        return
-    }
 
-}
+    }
 
     override fun onCleared() {
         state.value = state.value.copy(

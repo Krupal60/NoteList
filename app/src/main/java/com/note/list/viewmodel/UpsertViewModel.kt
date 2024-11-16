@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.note.list.data.repository.note.NoteRepositoryImpl
 import com.note.list.domain.note.Note
-import com.note.list.domain.upsert.OnNoteUpsertAcion
+import com.note.list.domain.upsert.OnNoteUpsertAction
 import com.note.list.ui.view.screens.UpsertState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,10 +50,10 @@ class UpsertViewModel @Inject constructor(
     }
 
 
-    fun onAction(onNoteUpsertAcion: OnNoteUpsertAcion) {
-        when (onNoteUpsertAcion) {
-            is OnNoteUpsertAcion.Delete -> deleteNote()
-            is OnNoteUpsertAcion.NoteUpsert -> upsertNote()
+    fun onAction(onNoteUpsertAction: OnNoteUpsertAction) {
+        when (onNoteUpsertAction) {
+            is OnNoteUpsertAction.Delete -> deleteNote()
+            is OnNoteUpsertAction.NoteUpsert -> upsertNote()
         }
     }
 

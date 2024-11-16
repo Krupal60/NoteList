@@ -58,6 +58,7 @@ fun ToDoList(
         AnimatedVisibility(!todo.isDone) {
             IconButton(modifier = Modifier.weight(0.2f),
                 onClick = {
+                    onAction(OnToDoAction.GetData(todo.id))
                     onAction(OnToDoAction.Edit(id = todo.id))
                     onAction(OnToDoAction.ShowDialog)
                 }) {

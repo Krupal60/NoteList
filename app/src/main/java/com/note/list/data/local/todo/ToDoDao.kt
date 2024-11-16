@@ -16,7 +16,7 @@ interface ToDoDao {
     fun getToDoListByDone() : Flow<List<ToDoList>>
 
     @Query(" SELECT * FROM  ToDoList WHERE id = :id" )
-    fun getToDoListDetail(id : Int) : Flow<ToDoList>
+    suspend fun getToDoListDetail(id: Int): ToDoList
 
     @Upsert
     suspend fun upsert(vararg toDoList : ToDoList)

@@ -1,7 +1,9 @@
 package com.note.list.domain.todo
 
+import androidx.compose.runtime.Stable
 import com.note.list.data.local.todo.ToDoList
 
+@Stable
 data class ToDo(
     val description: String,
     val lastUpdated: Long,
@@ -9,6 +11,7 @@ data class ToDo(
     val id: Int = 0
 )
 
+@Stable
 fun ToDoList.toToDo(): ToDo {
     return ToDo(
     description = this.description,
@@ -18,6 +21,7 @@ fun ToDoList.toToDo(): ToDo {
     )
 }
 
+@Stable
 fun ToDo.toToDoList(): ToDoList {
     return ToDoList(
         description = this.description,

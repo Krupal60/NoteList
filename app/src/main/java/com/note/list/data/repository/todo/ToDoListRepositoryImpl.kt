@@ -31,14 +31,8 @@ class ToDoListRepositoryImpl @Inject constructor(private val dao: ToDoDao) : Tod
         }
     }
 
-    override fun getToDoListDetail(id: Int): Flow<Result<ToDo>> {
-        return  dao.getToDoListDetail(id).map {
-            try {
-                Result.success(it.toToDo())
-            }catch (e :Exception){
-                Result.failure(e)
-            }
-        }
+    override suspend fun getToDoListDetail(id: Int): ToDo {
+        return dao.getToDoListDetail(id).toToDo()
     }
 
     override suspend fun upsert(toDo: ToDo) {
