@@ -65,7 +65,8 @@ data class UpsertState(
 @Composable
 fun UpsertMain(
     navController: NavHostController,
-    viewModel: UpsertViewModel = hiltViewModel()
+    viewModel: UpsertViewModel = hiltViewModel(),
+    onBack: () -> Unit
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
@@ -73,7 +74,8 @@ fun UpsertMain(
         navController, state,
         viewModel::onAction,
         viewModel::onTitleChange,
-        viewModel::onTextChange
+        viewModel::onTextChange,
+        onBack
     )
 }
 
@@ -84,7 +86,8 @@ fun Upsert(
     state: State<UpsertState>,
     onAction: (OnNoteUpsertAction) -> Unit,
     onTitleChange: (String) -> Unit,
-    onTextChange: (String) -> Unit
+    onTextChange: (String) -> Unit,
+    onBack: () -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
@@ -94,10 +97,10 @@ fun Upsert(
                 scrollBehavior = scrollBehavior,
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.popBackStack()
+                        onBack()
                     }) {
                         IconButton(onClick = {
-                            navController.popBackStack()
+                            onBack()
                         }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -109,7 +112,8 @@ fun Upsert(
                 actions = {
                     IconButton(onClick = {
                         onAction(OnNoteUpsertAction.NoteUpsert)
-                        navController.popBackStack()
+                        navController.navigateUp()
+
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Check,
@@ -121,7 +125,7 @@ fun Upsert(
                         onAction(
                             OnNoteUpsertAction.Delete
                         )
-                        navController.popBackStack()
+                        onBack()
                     }) {
                         Icon(
                             imageVector = Icons.Filled.DeleteForever,

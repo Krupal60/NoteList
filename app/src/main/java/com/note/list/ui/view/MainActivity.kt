@@ -97,7 +97,9 @@ class MainActivity : ComponentActivity() {
                                 type = NavType.IntType
                             })
                         ) {
-                            UpsertMain(navController = navController)
+                            UpsertMain(navController = navController) {
+                                this@MainActivity.onBackPressedDispatcher.onBackPressed()
+                            }
                         }
 
 
