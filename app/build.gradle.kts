@@ -15,8 +15,8 @@ android {
         applicationId = "com.note.list"
         minSdk = 24
         targetSdk = 35
-        versionCode = 8
-        versionName = "1.8"
+        versionCode = 9
+        versionName = "1.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -26,11 +26,6 @@ android {
         room {
             schemaDirectory("$projectDir/schemas")
         }
-
-//        ksp {
-//            arg("room.schemaLocation", "$projectDir/schemas")
-//            // other options...
-//        }
 
     }
 
@@ -97,13 +92,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     // Room
     implementation(libs.room.ktx)
-
-    // navigation suite alpha
-
-    implementation(libs.androidx.material3.adaptive.navigation.suite.android)
-    implementation(libs.androidx.adaptive.android)
-
-
     ksp(libs.androidx.room.compiler)
     androidTestImplementation(libs.androidx.room.testing)
 
@@ -127,4 +115,13 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    //adptive layout
+    implementation(libs.androidx.adaptive)
+    implementation(libs.androidx.adaptive.layout)
+    implementation(libs.androidx.adaptive.navigation)
+    // navigation suite
+    implementation(libs.androidx.material3.adaptive.navigation.suite)
+
+    implementation(libs.androidx.ui.text.google.fonts)
 }

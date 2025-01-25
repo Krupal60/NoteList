@@ -21,6 +21,8 @@
 #-renamesourcefileattribute SourceFile
 
 -keep class com.note.list.data.local.note.Notes{*;}
+-keep class com.note.list.domain.note.Note{*;}
+-keep class com.note.list.domain.note.NotesKt{*;}
 -keep class com.note.list.data.local.todo.ToDoList{*;}
 -keep class com.note.list.domain.todo.ToDoKt{*;}
 -keep class com.note.list.domain.todo.ToDo{*;}

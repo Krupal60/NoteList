@@ -17,11 +17,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -40,7 +38,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
-@Stable
+@Immutable
 data class NavItems(
     val title: String, val route: String, val icon: ImageVector
 )
@@ -68,25 +66,25 @@ class MainActivity : ComponentActivity() {
                         enterTransition = {
                             slideIntoContainer(
                                 AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(600)
+                                animationSpec = tween(500)
                             )
                         },
                         exitTransition = {
                             slideOutOfContainer(
                                 AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(600)
+                                animationSpec = tween(500)
                             )
                         },
                         popEnterTransition = {
                             slideIntoContainer(
                                 AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(600)
+                                animationSpec = tween(500)
                             )
                         },
                         popExitTransition = {
                             slideOutOfContainer(
                                 AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(600)
+                                animationSpec = tween(500)
                             )
                         }) {
 
@@ -97,12 +95,8 @@ class MainActivity : ComponentActivity() {
                                 type = NavType.IntType
                             })
                         ) {
-                            UpsertMain(navController = navController) {
-                                this@MainActivity.onBackPressedDispatcher.onBackPressed()
-                            }
+                            UpsertMain(navController = navController)
                         }
-
-
 
 
                         composable(Screen.MainScreen.route) {
@@ -133,8 +127,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainContent(onItemClick: (Int) -> Unit, onFabClick: (Int) -> Unit) {
     val navController = rememberNavController()
-    val navSuiteType = calculateFromAdaptiveInfo(currentWindowAdaptiveInfo())
-
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val data = listOf(
         NavItems("Notes", "Notes/{id}", Icons.AutoMirrored.Filled.Notes),
@@ -142,8 +134,7 @@ fun MainContent(onItemClick: (Int) -> Unit, onFabClick: (Int) -> Unit) {
     )
 
 
-    NavigationSuiteScaffold(layoutType = navSuiteType, navigationSuiteItems = {
-
+    NavigationSuiteScaffold(navigationSuiteItems = {
         data.forEach { item ->
             item(selected = currentBackStackEntry?.destination?.let {
                 it.route == item.route

@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -35,8 +35,6 @@ import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -67,17 +65,16 @@ fun NoteScreen(
     notes: State<Result<List<Note>>>, onFloatButtonClick: () -> Unit, onItemClick: (Int) -> Unit
 ) {
     Scaffold(modifier = Modifier
-        .navigationBarsPadding()
         .fillMaxSize(), topBar = {
         TopAppBar(title = {
             Text(
                 text = "Notes",
-                modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 10.dp),
                 style = MaterialTheme.typography.titleLarge
             )
         })
     }, floatingActionButton = {
-        FloatingActionButton(modifier = Modifier.padding(bottom = 12.dp, end = 5.dp),
+        FloatingActionButton(
+            modifier = Modifier.padding(bottom = 8.dp, end = 5.dp),
             shape = CircleShape,
             onClick = {
                 onFloatButtonClick()
@@ -95,55 +92,55 @@ fun NoteScreen(
         val startPadding = displayCutout.calculateStartPadding(layoutDirection)
         val endPadding = displayCutout.calculateEndPadding(layoutDirection)
         notesData.onSuccess { notes ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(
-                        top = paddingValues.calculateTopPadding(),
-                        bottom = paddingValues.calculateBottomPadding(),
-                        start = startPadding.coerceAtLeast(14.dp),
-                        end = endPadding.coerceAtLeast(14.dp)
-                    ),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceAround
-            ) {
-                AnimatedVisibility(notes.isEmpty()) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 24.dp),
-                        textAlign = TextAlign.Center,
-                        text = "Nothing Here , Create New Note..",
-                        style = MaterialTheme.typography.headlineSmall
-                    )
+            if (notes.isEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(
+                            top = paddingValues.calculateTopPadding(),
+                            bottom = paddingValues.calculateBottomPadding(),
+                            start = startPadding.coerceAtLeast(14.dp),
+                            end = endPadding.coerceAtLeast(14.dp)
+                        ),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceAround
+                ) {
+                    AnimatedVisibility(notes.isEmpty()) {
+                        Text(
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 24.dp),
+                            textAlign = TextAlign.Center,
+                            text = "Nothing Here , Create New Note..",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
 
+                    }
                 }
             }
-        }
-        notesData.onSuccess { notes ->
             LazyVerticalStaggeredGrid(
                 columns = StaggeredGridCells.Fixed(2),
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(
-                        top = paddingValues.calculateTopPadding(),
-                        bottom = paddingValues.calculateBottomPadding(),
-                        start = startPadding.coerceAtLeast(14.dp),
-                        end = endPadding.coerceAtLeast(14.dp)
-                    ),
-
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalItemSpacing = 10.dp,
+                    .fillMaxSize(),
+                contentPadding = PaddingValues(
+                    top = paddingValues.calculateTopPadding().plus(6.dp),
+                    bottom = paddingValues.calculateBottomPadding().plus(6.dp),
+                    start = startPadding.coerceAtLeast(14.dp),
+                    end = endPadding.coerceAtLeast(14.dp)
+                ),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalItemSpacing = 12.dp,
             ) {
 
                 items(notes, key = { it.id }) { note ->
-                    ElevatedCard(modifier = Modifier.animateItem(),
+                    ElevatedCard(
+                        modifier = Modifier.animateItem(),
                         shape = RoundedCornerShape(10.dp),
                         elevation = CardDefaults.elevatedCardElevation(
-                            10.dp,
-                            10.dp,
-                            10.dp,
-                            10.dp,
-                            10.dp,
-                            10.dp
+                            4.dp,
+                            4.dp,
+                            4.dp,
+                            4.dp,
+                            4.dp,
+                            4.dp
                         ),
                         onClick = {
                             onItemClick(note.id)
@@ -158,10 +155,12 @@ fun NoteScreen(
                                 Text(
                                     text = note.title,
                                     textAlign = TextAlign.Justify,
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.SemiBold,
-                                    fontFamily = FontFamily.Serif,
-                                    style = MaterialTheme.typography.titleMedium,
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        textAlign = TextAlign.Justify,
+                                        fontWeight = FontWeight.SemiBold
+                                    ),
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
                                     modifier = Modifier.fillMaxWidth()
 
                                 )
@@ -171,9 +170,8 @@ fun NoteScreen(
                                 Text(
                                     text = note.description,
                                     textAlign = TextAlign.Justify,
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.Normal,
-                                    fontFamily = FontFamily.Serif,
+                                    style = MaterialTheme.typography.bodyLarge
+                                        .copy(textAlign = TextAlign.Justify),
                                     overflow = TextOverflow.Ellipsis,
                                     maxLines = 10,
                                     modifier = Modifier.fillMaxWidth()
@@ -188,6 +186,5 @@ fun NoteScreen(
             }
         }
     }
-
 
 }

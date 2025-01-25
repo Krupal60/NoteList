@@ -1,12 +1,12 @@
 package com.note.list.data.local.note
 
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 
 @Entity(tableName = "notes")
-@Stable
+@Immutable
 data class Notes(
     val title : String,
     val description : String,

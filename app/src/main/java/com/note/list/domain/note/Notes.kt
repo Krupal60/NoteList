@@ -1,14 +1,16 @@
 package com.note.list.domain.note
 
+import androidx.compose.runtime.Immutable
 import com.note.list.data.local.note.Notes
-import kotlinx.coroutines.flow.MutableStateFlow
 
+@Immutable
 data class Note(
     val title: String,
     val description: String,
     val lastUpdated: Long,
     val id: Int = 0 // No need for auto-generation here
 )
+
 
 fun Notes.toNote(): Note {
     return Note(
