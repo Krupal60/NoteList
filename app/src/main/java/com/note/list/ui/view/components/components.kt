@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.note.list.domain.todo.OnToDoAction
 import com.note.list.domain.todo.ToDo
@@ -27,7 +28,6 @@ fun ToDoList(
     todo: ToDo,
     onAction: (OnToDoAction) -> Unit
 ) {
-
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -85,4 +85,14 @@ fun ToDoList(
 
 
 }
+
+@Preview(showBackground = true, showSystemUi = true, backgroundColor = 0xFFF0EAE2)
+@Composable
+fun ToDoListPreview() {
+    val todo =
+        ToDo(description = "Sample ToDo", lastUpdated = System.currentTimeMillis(), isDone = false)
+    ToDoList(todo = todo, onAction = {})
+}
+
+
 

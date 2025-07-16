@@ -1,7 +1,10 @@
 package com.note.list.ui.view
 
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -49,11 +52,17 @@ class MainActivity : ComponentActivity() {
     private val viewModel by viewModels<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         installSplashScreen().setKeepOnScreenCondition {
             viewModel.isLoading
         }
+        enableEdgeToEdge(
+            SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
+            SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT)
+        )
         super.onCreate(savedInstanceState)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
         setContent {
             NoteListTheme {
                 // A surface container using the 'background' color from the theme
@@ -61,7 +70,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface
                 ) {
                     val navController = rememberNavController()
-                    androidx.navigation.compose.NavHost(navController = navController,
+                    androidx.navigation.compose.NavHost(
+                        navController = navController,
                         startDestination = Screen.MainScreen.route,
                         enterTransition = {
                             slideIntoContainer(
@@ -136,7 +146,8 @@ fun MainContent(onItemClick: (Int) -> Unit, onFabClick: (Int) -> Unit) {
 
     NavigationSuiteScaffold(navigationSuiteItems = {
         data.forEach { item ->
-            item(selected = currentBackStackEntry?.destination?.let {
+            item(
+                selected = currentBackStackEntry?.destination?.let {
                 it.route == item.route
             } == true,
                 onClick = {

@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.note.list"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.note.list"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 9
         versionName = "1.9"
 
@@ -22,11 +22,10 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+    }
 
-        room {
-            schemaDirectory("$projectDir/schemas")
-        }
-
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
 
     buildTypes {
@@ -54,9 +53,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "21"
-    }
+
     buildFeatures {
         compose = true
     }
@@ -67,10 +64,6 @@ android {
         }
     }
 
-
-}
-composeCompiler {
-    reportsDestination = layout.buildDirectory.dir("compose_compiler")
 }
 
 
@@ -102,10 +95,7 @@ dependencies {
 
     // Material Icon Extension
     implementation(libs.androidx.material.icons.extended)
-
-    //text editer
-//    implementation(libs.richeditor.compose)
-
+    // Splash Screen
     implementation(libs.androidx.core.splashscreen)
 
     testImplementation(libs.junit)

@@ -6,7 +6,12 @@
         <item name="android:windowSplashScreenAnimatedIcon" tools:ignore="NewApi">@mipmap/ic_launcher</item>
         <item name="android:windowSplashScreenAnimationDuration" tools:ignore="NewApi">200</item>
         <item name="android:windowSplashScreenBehavior" tools:ignore="NewApi">icon_preferred</item>
+        <item name="postSplashScreenTheme">@style/Theme.NoteList.app</item>
+    </style>
 
-        <!--        <item name="android:windowLayoutInDisplayCutoutMode" tools:ignore="NewApi">shortEdges</item>-->
+    <style name="Theme.NoteList.app" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:enforceNavigationBarContrast" tools:ignore="NewApi">false</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 </resources>
