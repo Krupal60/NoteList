@@ -21,12 +21,18 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonShapes
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,8 +47,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -75,7 +83,7 @@ fun ToDoListScreenMain(viewModel: ToDoListViewModel = hiltViewModel()) {
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalFoundationApi::class,
-    ExperimentalAnimationApi::class
+    ExperimentalAnimationApi::class, ExperimentalMaterial3ExpressiveApi::class
 )
 @Composable
 fun ToDoListScreen(
@@ -92,21 +100,34 @@ fun ToDoListScreen(
                 onAction(OnToDoAction.HideDialog)
             },
             confirmButton = {
-                OutlinedButton(onClick = {
-                    if (state.description.length > 280) {
-                        Toast.makeText(context, "Only 280 words allow", Toast.LENGTH_SHORT).show()
-                    } else {
-                        onAction(OnToDoAction.Upsert)
-                        onAction(OnToDoAction.HideDialog)
-                    }
-                }
+                Button(
+                    onClick = {
+                        if (state.description.length > 280) {
+                            Toast.makeText(context, "Only 280 words allow", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            onAction(OnToDoAction.Upsert)
+                            onAction(OnToDoAction.HideDialog)
+                        }
+                    },
+                    shapes = ButtonShapes(
+                        shape = ButtonDefaults.shape,
+                        pressedShape = RoundedCornerShape(8.dp)
+                    )
+
                 ) {
                     Text(text = if (state.id == 0) "Save" else "Update")
                 }
 
             },
             dismissButton = {
-                OutlinedButton(onClick = { onAction(OnToDoAction.HideDialog) }) {
+                OutlinedButton(
+                    onClick = { onAction(OnToDoAction.HideDialog) },
+                    shapes = ButtonShapes(
+                        shape = ButtonDefaults.shape,
+                        pressedShape = RoundedCornerShape(8.dp)
+                    )
+                ) {
                     Text(text = "Cancel")
                 }
 
@@ -132,6 +153,20 @@ fun ToDoListScreen(
                     isError = state.description.length > 280,
                     placeholder = {
                         Text(text = "Add Description")
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Words,
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions {
+                        if (state.description.length > 280) {
+                            Toast.makeText(context, "Only 280 words allow", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            onAction(OnToDoAction.Upsert)
+                            onAction(OnToDoAction.HideDialog)
+                        }
                     }
                 )
             }
@@ -208,13 +243,6 @@ fun ToDoListScreen(
                                 fadeInSpec = tween(durationMillis = 300),
                                 fadeOutSpec = tween(durationMillis = 300)
                             )
-                            .shadow(
-                                elevation = 3.dp,
-                                shape = CardDefaults.elevatedShape,
-                                clip = true,
-                                ambientColor = MaterialTheme.colorScheme.inverseSurface,
-                                spotColor = MaterialTheme.colorScheme.inverseSurface
-                            )
                     ) {
                         ToDoList(todo, onAction)
                     }
@@ -248,13 +276,7 @@ fun ToDoListScreen(
                                     fadeInSpec = tween(durationMillis = 300),
                                     fadeOutSpec = tween(durationMillis = 300)
                                 )
-                                .shadow(
-                                    elevation = 3.dp,
-                                    shape = CardDefaults.elevatedShape,
-                                    clip = true,
-                                    ambientColor = MaterialTheme.colorScheme.inverseSurface,
-                                    spotColor = MaterialTheme.colorScheme.inverseSurface
-                                )
+
                         ) {
                             ToDoList(todo, onAction)
                         }
