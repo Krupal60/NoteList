@@ -5,10 +5,6 @@ import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -239,10 +235,7 @@ fun ToDoListScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 12.dp)
-                            .animateItem(
-                                fadeInSpec = tween(durationMillis = 300),
-                                fadeOutSpec = tween(durationMillis = 300)
-                            )
+                            .animateItem()
                     ) {
                         ToDoList(todo, onAction)
                     }
@@ -252,11 +245,7 @@ fun ToDoListScreen(
 
                     item {
                         AnimatedVisibility(
-                            visible = toDoListDoneItems.isNotEmpty(),
-                            enter = fadeIn(animationSpec = tween(durationMillis = 300)) + slideInVertically(
-                                animationSpec = tween(durationMillis = 300)
-                            ),
-                            exit = fadeOut(animationSpec = tween(durationMillis = 300))
+                            visible = toDoListDoneItems.isNotEmpty()
                         ) {
                             Text(
                                 text = "Completed",
@@ -272,10 +261,7 @@ fun ToDoListScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 12.dp)
-                                .animateItem(
-                                    fadeInSpec = tween(durationMillis = 300),
-                                    fadeOutSpec = tween(durationMillis = 300)
-                                )
+                                .animateItem()
 
                         ) {
                             ToDoList(todo, onAction)
