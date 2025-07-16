@@ -1,7 +1,6 @@
 package com.note.list.data.repository.note
 
 import com.note.list.data.local.note.NoteDao
-import com.note.list.data.local.note.Notes
 import com.note.list.domain.note.Note
 import com.note.list.domain.note.NoteRepository
 import com.note.list.domain.note.toNote
@@ -24,10 +23,10 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getNotesDetail(id: Int): Flow<Result<Note>> {
+    override fun getNotesDetail(id: Int): Flow<Result<Note?>> {
         return  dao.getNoteDetail(id).map { note ->
             try {
-                Result.success(note.toNote())
+                Result.success(note?.toNote())
             }catch (e:Exception){
                 Result.failure(e)
             }

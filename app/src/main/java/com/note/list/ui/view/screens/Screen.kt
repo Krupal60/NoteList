@@ -1,8 +1,13 @@
 package com.note.list.ui.view.screens
 
-sealed class Screen(val route : String) {
-    data object MainScreen : Screen("main")
-    data object NoteScreen : Screen("Notes/{id}")
-    data object ToDoList : Screen("To-Do List")
-    data object Upsert : Screen("Upsert")
+
+sealed class RootScreen(val route: String) {
+    data object NoteGraph : RootScreen("note_graph")
+    data object ToDoList : RootScreen("to_do_list")
+}
+
+
+sealed class NoteScreen(val route: String) {
+    data object Notes : NoteScreen("Notes/{id}")
+    data object Upsert : NoteScreen("Upsert")
 }

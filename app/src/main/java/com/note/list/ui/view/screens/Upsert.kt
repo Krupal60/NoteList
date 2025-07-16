@@ -34,6 +34,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
@@ -43,11 +44,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.note.list.domain.upsert.OnNoteUpsertAction
 import com.note.list.viewmodel.UpsertViewModel
 
@@ -62,7 +65,7 @@ fun UpsertMain(
     navController: NavHostController,
     viewModel: UpsertViewModel = hiltViewModel()
 ) {
-    val state = viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     Upsert(
         navController, state,
@@ -76,7 +79,7 @@ fun UpsertMain(
 @Composable
 fun Upsert(
     navController: NavHostController,
-    state: State<UpsertState>,
+    state: UpsertState,
     onAction: (OnNoteUpsertAction) -> Unit,
     onTitleChange: (String) -> Unit,
     onTextChange: (String) -> Unit
@@ -104,7 +107,7 @@ fun Upsert(
                             contentDescription = "Edit or Create"
                         )
                     }
-                    if (state.value.title.isNotEmpty() || state.value.description.isNotEmpty()) {
+                    if (state.title.isNotEmpty() || state.description.isNotEmpty()) {
                         IconButton(onClick = {
                             onAction(
                                 OnNoteUpsertAction.Delete
@@ -129,22 +132,21 @@ fun Upsert(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(
-                    top = padding.calculateTopPadding(),
-                    start = startPadding.coerceAtLeast(12.dp),
-                    end = endPadding.coerceAtLeast(12.dp)
-                ),
+                .padding(padding),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             TextField(
-                value = state.value.title,
+                value = state.title,
                 onValueChange = {
                     onTitleChange(it)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(
+                        horizontal = 12.dp
+                    )
                     .wrapContentHeight()
                     .padding(
                         start = startPadding.coerceAtLeast(6.dp),
@@ -157,9 +159,11 @@ fun Upsert(
                 maxLines = 3,
                 placeholder = {
                     Text(
-                        text = "Title",
+                        text = "Enter Title Here...",
                         style = MaterialTheme.typography.titleLarge.copy(
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = MaterialTheme.colorScheme.onSurface.copy(
+                                alpha = 0.7f
+                            ),
                             textAlign = TextAlign.Justify
                         )
                     )
@@ -176,16 +180,18 @@ fun Upsert(
 
 
             TextField(
-                value = state.value.description,
+                value = state.description,
                 onValueChange = {
                     onTextChange(it)
                 },
                 modifier = Modifier
                     .fillMaxSize()
                     .imePadding()
+                    .padding(
+                        horizontal = 12.dp
+                    )
                     .clip(RoundedCornerShape(10.dp))
                     .padding(
-                        bottom = padding.calculateBottomPadding().coerceAtLeast(10.dp),
                         top = 12.dp
                     )
                     .padding(
@@ -199,9 +205,11 @@ fun Upsert(
                 ),
                 placeholder = {
                     Text(
-                        text = "note",
+                        text = "Enter your note here...",
                         style = MaterialTheme.typography.bodyLarge.copy(
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = MaterialTheme.colorScheme.onSurface.copy(
+                                alpha = 0.7f
+                            ),
                             textAlign = TextAlign.Justify
                         )
                     )
@@ -215,10 +223,25 @@ fun Upsert(
                     disabledIndicatorColor = Color.Transparent
                 )
             )
-            ProtectNavigationBar(Modifier)
         }
     }
 }
+
+@Preview
+@Composable
+fun UpsertPreview() {
+    val navController = rememberNavController()
+    val state =
+        UpsertState(title = "Sample Title", description = "Sample description text for the note.")
+    Upsert(
+        navController = navController,
+        state = state,
+        onAction = {},
+        onTitleChange = {},
+        onTextChange = {}
+    )
+}
+
 
 
 @Composable

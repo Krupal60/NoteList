@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.note.list.data.repository.note.NoteRepositoryImpl
 import com.note.list.domain.note.Note
+import com.note.list.domain.note.NoteRepository
 import com.note.list.domain.upsert.OnNoteUpsertAction
 import com.note.list.ui.view.screens.UpsertState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UpsertViewModel @Inject constructor(
-    private val repository: NoteRepositoryImpl,
+    private val repository: NoteRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -30,7 +30,7 @@ class UpsertViewModel @Inject constructor(
         getData()
     }
 
-    private fun getData(){
+    private fun getData() {
         viewModelScope.launch {
             if (id != null) {
                 repository.getNotesDetail(id).collect { resultData ->
@@ -38,8 +38,8 @@ class UpsertViewModel @Inject constructor(
                         result = it
                         Log.i("result", result.toString())
                         state.value = state.value.copy(
-                            title = result!!.title,
-                            description = result!!.description
+                            title = result?.title ?: "",
+                            description = result?.description ?: ""
                         )
                     }
                 }
@@ -58,7 +58,7 @@ class UpsertViewModel @Inject constructor(
     }
 
     private fun upsertNote() {
-        if (state.value.title.isNotBlank() || state.value.description.isNotBlank() ) {
+        if (state.value.title.isNotBlank() || state.value.description.isNotBlank()) {
             viewModelScope.launch {
                 repository.upsert(
                     Note(
@@ -97,33 +97,10 @@ class UpsertViewModel @Inject constructor(
 
     fun onTitleChange(title: String) {
         state.value = state.value.copy(title = title)
-//        viewModelScope.launch {
-//            if (state.value.title.isNotEmpty() || state.value.description.isNotEmpty()) {
-//                repository.upsert(
-//                    Note(
-//                        state.value.title,
-//                        state.value.description,
-//                        System.currentTimeMillis()
-//                    )
-//                )
-//            }
-//        }
     }
 
     fun onTextChange(description: String) {
         state.value = state.value.copy(description = description)
-//        viewModelScope.launch {
-//            if (state.value.title.isNotEmpty() || state.value.description.isNotEmpty()) {
-//                repository.upsert(
-//                    Note(
-//                        state.value.title,
-//                        state.value.description,
-//                        System.currentTimeMillis()
-//                    )
-//                )
-//            }
-//        }
-
     }
 
 }

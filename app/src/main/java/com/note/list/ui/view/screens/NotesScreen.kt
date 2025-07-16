@@ -64,8 +64,7 @@ fun NoteScreenMain(
 fun NoteScreen(
     notes: State<Result<List<Note>>>, onFloatButtonClick: () -> Unit, onItemClick: (Int) -> Unit
 ) {
-    Scaffold(modifier = Modifier
-        .fillMaxSize(), topBar = {
+    Scaffold(topBar = {
         TopAppBar(title = {
             Text(
                 text = "Notes",
