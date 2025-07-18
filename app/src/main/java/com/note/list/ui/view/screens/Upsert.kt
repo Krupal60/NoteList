@@ -1,8 +1,6 @@
 package com.note.list.ui.view.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -11,11 +9,8 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.tappableElement
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -23,6 +18,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,16 +28,13 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -75,7 +68,7 @@ fun UpsertMain(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun Upsert(
     navController: NavHostController,
@@ -84,6 +77,11 @@ fun Upsert(
     onTitleChange: (String) -> Unit,
     onTextChange: (String) -> Unit
 ) {
+    DisposableEffect(Unit) {
+        onDispose {
+            onAction(OnNoteUpsertAction.NoteUpsert)
+        }
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -152,7 +150,7 @@ fun Upsert(
                         start = startPadding.coerceAtLeast(6.dp),
                         end = endPadding.coerceAtLeast(6.dp)
                     ),
-                textStyle = MaterialTheme.typography.titleLarge.copy(
+                textStyle = MaterialTheme.typography.titleMediumEmphasized.copy(
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Justify
                 ),
@@ -160,7 +158,7 @@ fun Upsert(
                 placeholder = {
                     Text(
                         text = "Enter Title Here...",
-                        style = MaterialTheme.typography.titleLarge.copy(
+                        style = MaterialTheme.typography.titleMediumEmphasized.copy(
                             color = MaterialTheme.colorScheme.onSurface.copy(
                                 alpha = 0.7f
                             ),
@@ -199,14 +197,14 @@ fun Upsert(
                         end = endPadding.coerceAtLeast(6.dp)
                     ),
 
-                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                textStyle = MaterialTheme.typography.bodyLargeEmphasized.copy(
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Justify
                 ),
                 placeholder = {
                     Text(
                         text = "Enter your note here...",
-                        style = MaterialTheme.typography.bodyLarge.copy(
+                        style = MaterialTheme.typography.bodyLargeEmphasized.copy(
                             color = MaterialTheme.colorScheme.onSurface.copy(
                                 alpha = 0.7f
                             ),
@@ -240,39 +238,4 @@ fun UpsertPreview() {
         onTitleChange = {},
         onTextChange = {}
     )
-}
-
-
-
-@Composable
-fun ProtectNavigationBar(modifier: Modifier = Modifier) {
-    val density = LocalDensity.current
-    val tappableElement = WindowInsets.tappableElement
-    val bottomPixels = tappableElement.getBottom(density)
-    val usingTappableBars = remember(bottomPixels) {
-        bottomPixels != 0
-    }
-    val barHeight = remember(bottomPixels) {
-        tappableElement.asPaddingValues(density).calculateBottomPadding()
-    }
-
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Bottom
-    ) {
-        if (usingTappableBars) {
-            Box(
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.background)
-                    .fillMaxWidth()
-                    .height(barHeight)
-            )
-        }
-    }
-}
-
-@Composable
-fun rememberKeyboard(): State<Boolean> {
-    val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
-    return rememberUpdatedState(isImeVisible)
 }

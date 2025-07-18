@@ -10,8 +10,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.note.list.domain.todo.OnToDoAction
 import com.note.list.domain.todo.ToDo
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ToDoList(
     todo: ToDo,
@@ -50,6 +53,7 @@ fun ToDoList(
         Text(
             text = todo.description,
             textAlign = TextAlign.Justify,
+            style = MaterialTheme.typography.bodyMediumEmphasized,
             textDecoration = if (todo.isDone) TextDecoration.LineThrough else TextDecoration.None,
             modifier = Modifier
                 .weight(1f)

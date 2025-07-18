@@ -151,6 +151,7 @@ fun ToDoListScreen(
                     placeholder = {
                         Text(text = "Add Description")
                     },
+                    textStyle = MaterialTheme.typography.bodyMediumEmphasized,
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Words,
                         keyboardType = KeyboardType.Text,

@@ -32,7 +32,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.note.list.ui.theme.NoteListTheme
 import com.note.list.ui.view.navigation.NavHost
-import com.note.list.ui.view.screens.RootScreen
+import com.note.list.ui.view.navigation.RootScreen
 import com.note.list.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 

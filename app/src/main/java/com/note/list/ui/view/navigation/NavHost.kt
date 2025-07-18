@@ -8,9 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.note.list.ui.view.screens.NoteScreen
 import com.note.list.ui.view.screens.NoteScreenMain
-import com.note.list.ui.view.screens.RootScreen
 import com.note.list.ui.view.screens.ToDoListScreenMain
 import com.note.list.ui.view.screens.UpsertMain
 

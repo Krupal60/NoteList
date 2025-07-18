@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -53,7 +54,10 @@ fun NoteScreenMain(
     })
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class,
+    ExperimentalMaterial3ExpressiveApi::class
+)
 @Composable
 fun NoteScreen(
     notes: State<Result<List<Note>>>, onFloatButtonClick: () -> Unit, onItemClick: (Int) -> Unit
@@ -132,7 +136,7 @@ fun NoteScreen(
                                         Text(
                                             text = note.title,
                                             textAlign = TextAlign.Justify,
-                                            style = MaterialTheme.typography.titleMedium.copy(
+                                            style = MaterialTheme.typography.titleMediumEmphasized.copy(
                                                 textAlign = TextAlign.Justify,
                                                 fontWeight = FontWeight.SemiBold
                                             ),
@@ -147,7 +151,7 @@ fun NoteScreen(
                                         Text(
                                             text = note.description,
                                             textAlign = TextAlign.Justify,
-                                            style = MaterialTheme.typography.bodyLarge
+                                            style = MaterialTheme.typography.bodyLargeEmphasized
                                                 .copy(textAlign = TextAlign.Justify),
                                             overflow = TextOverflow.Ellipsis,
                                             maxLines = 10,

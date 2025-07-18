@@ -1,4 +1,4 @@
-package com.note.list.ui.view.screens
+package com.note.list.ui.view.navigation
 
 
 sealed class RootScreen(val route: String) {
