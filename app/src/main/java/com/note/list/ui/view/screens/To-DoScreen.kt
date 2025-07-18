@@ -2,6 +2,7 @@ package com.note.list.ui.view.screens
 
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
@@ -40,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -193,118 +195,123 @@ fun ToDoListScreen(
         }
     ) { paddingValues ->
 
-        LazyColumn(
-            Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-                .animateContentSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            contentPadding = PaddingValues(bottom = 100.dp, top = 12.dp)
-        ) {
-            if (toDoListResult.isSuccess && toDoListDoneResult.isSuccess) {
-                val toDoList = toDoListResult.getOrThrow()
-                val toDoListDoneItems = toDoListDoneResult.getOrThrow()
-                if (toDoList.isEmpty() && toDoListDoneItems.isEmpty()) {
-                    stickyHeader {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                modifier = Modifier
-                                    .padding(horizontal = 14.dp, vertical = 24.dp),
-                                textAlign = TextAlign.Center,
-                                text = "Nothing Here , Create New To-Do List..",
-                                style = MaterialTheme.typography.headlineSmall
-                            )
-                        }
+        AnimatedContent(
+            toDoListResult.getOrThrow().isEmpty() && toDoListDoneResult.getOrThrow().isEmpty()
+        ) { state ->
+            if (state) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceAround
+                ) {
+                    AnimatedVisibility(true) {
+                        Text(
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 24.dp),
+                            textAlign = TextAlign.Center,
+                            text = "Nothing Here , Create New To-Do List..",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
                     }
                 }
-            }
+            } else {
+                LazyColumn(
+                    Modifier
+                        .padding(paddingValues)
+                        .fillMaxSize()
+                        .animateContentSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = PaddingValues(top = 12.dp, bottom = 100.dp)
+                ) {
+                    toDoListResult.onSuccess { toDoList ->
 
-            toDoListResult.onSuccess { toDoList ->
-
-                items(items = toDoList, key = { "todo_${it.id}" }) { todo ->
-                    ElevatedCard(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp)
-                            .animateItem()
-                    ) {
-                        ToDoList(todo, onAction)
-                    }
-                }
-
-                toDoListDoneResult.onSuccess { toDoListDoneItems ->
-
-                    item {
-                        AnimatedVisibility(
-                            visible = toDoListDoneItems.isNotEmpty()
-                        ) {
-                            Text(
-                                text = "Completed",
+                        items(items = toDoList, key = { "todo_${it.id}" }) { todo ->
+                            ElevatedCard(
                                 modifier = Modifier
+                                    .fillMaxWidth()
                                     .padding(horizontal = 12.dp)
-                                    .padding(vertical = 14.dp)
-                            )
+                                    .animateItem()
+                            ) {
+                                ToDoList(todo, onAction)
+                            }
                         }
-                    }
 
-                    items(toDoListDoneItems, key = { "done_${it.id}" }) { todo ->
-                        ElevatedCard(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 12.dp)
-                                .animateItem()
+                        toDoListDoneResult.onSuccess { toDoListDoneItems ->
 
-                        ) {
-                            ToDoList(todo, onAction)
+                            item {
+                                AnimatedVisibility(
+                                    visible = toDoListDoneItems.isNotEmpty()
+                                ) {
+                                    Text(
+                                        text = "Completed",
+                                        modifier = Modifier
+                                            .padding(horizontal = 12.dp)
+                                            .padding(vertical = 14.dp)
+                                    )
+                                }
+                            }
+
+                            items(toDoListDoneItems, key = { "done_${it.id}" }) { todo ->
+                                ElevatedCard(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 12.dp)
+                                        .animateItem()
+                                ) {
+                                    ToDoList(todo, onAction)
+                                }
+                            }
+
                         }
-                    }
 
+                    }
                 }
             }
         }
     }
+
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ToDoListScreenPreview() {
-    val toDoList by mutableStateOf(
-        Result.success(
-            listOf(
-                ToDo(
-                    id = 1,
-                    description = "Buy groceries",
-                    lastUpdated = System.currentTimeMillis(),
-                    isDone = false
-                ),
-                ToDo(
-                    id = 2,
-                    description = "Walk the dog",
-                    lastUpdated = System.currentTimeMillis(),
-                    isDone = false
+    val toDoList by remember {
+        mutableStateOf(
+            Result.success(
+                listOf(
+                    ToDo(
+                        id = 1,
+                        description = "Buy groceries",
+                        lastUpdated = System.currentTimeMillis(),
+                        isDone = false
+                    ),
+                    ToDo(
+                        id = 2,
+                        description = "Walk the dog",
+                        lastUpdated = System.currentTimeMillis(),
+                        isDone = false
+                    )
                 )
             )
         )
-    )
-    val toDoListDone by mutableStateOf(
-        Result.success(
-            listOf(
-                ToDo(
-                    id = 3,
-                    description = "Pay bills",
-                    lastUpdated = System.currentTimeMillis(),
-                    isDone = true
+    }
+    val toDoListDone by remember {
+        mutableStateOf(
+            Result.success(
+                listOf(
+                    ToDo(
+                        id = 3,
+                        description = "Pay bills",
+                        lastUpdated = System.currentTimeMillis(),
+                        isDone = true
+                    )
                 )
             )
         )
-    )
-    val state by mutableStateOf(ToDoState(showDialog = false))
+    }
+    val state by remember { mutableStateOf(ToDoState(showDialog = false)) }
     val onAction: (OnToDoAction) -> Unit = {}
 
     ToDoListScreen(
