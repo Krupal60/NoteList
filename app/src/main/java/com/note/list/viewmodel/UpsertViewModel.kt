@@ -102,4 +102,9 @@ class UpsertViewModel @Inject constructor(
         state.value = state.value.copy(description = description)
     }
 
+    override fun onCleared() {
+        result = null
+        super.onCleared()
+    }
+
 }
