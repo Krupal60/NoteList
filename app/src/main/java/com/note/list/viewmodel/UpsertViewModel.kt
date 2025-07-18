@@ -76,7 +76,6 @@ class UpsertViewModel @Inject constructor(
 
     private fun deleteNote() {
         if (result == null) {
-            state.value = state.value
             return
         }
         if (state.value.title.isNotBlank() || state.value.description.isNotBlank() && result != null) {
