@@ -109,7 +109,7 @@ fun NoteScreen(
                             .fillMaxSize()
                             .padding(paddingValues),
                         contentPadding = PaddingValues(
-                            top = 12.dp, bottom = 100.dp
+                            top = 12.dp, bottom = 100.dp, start = 12.dp, end = 12.dp
                         ),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalItemSpacing = 12.dp,
@@ -117,8 +117,7 @@ fun NoteScreen(
                         items(notes, key = { it.id }) { note ->
                             ElevatedCard(
                                 modifier = Modifier
-                                    .animateItem()
-                                    .padding(horizontal = 12.dp),
+                                    .animateItem(),
                                 shape = RoundedCornerShape(10.dp),
                                 onClick = {
                                     onItemClick(note.id)
