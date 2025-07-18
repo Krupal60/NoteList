@@ -1,6 +1,5 @@
 package com.note.list.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -36,7 +35,6 @@ class UpsertViewModel @Inject constructor(
                 repository.getNotesDetail(id).collect { resultData ->
                     resultData.map {
                         result = it
-                        Log.i("result", result.toString())
                         state.value = state.value.copy(
                             title = result?.title ?: "",
                             description = result?.description ?: ""
@@ -58,7 +56,9 @@ class UpsertViewModel @Inject constructor(
     }
 
     private fun upsertNote() {
-        if (state.value.title.isNotBlank() || state.value.description.isNotBlank()) {
+        val valueChanged =
+            state.value.title != result?.title || state.value.description != result?.description
+        if (valueChanged && state.value.title.isNotBlank() && state.value.description.isNotBlank()) {
             viewModelScope.launch {
                 repository.upsert(
                     Note(
