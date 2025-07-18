@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +55,7 @@ fun ToDoList(
             text = todo.description,
             textAlign = TextAlign.Justify,
             style = MaterialTheme.typography.bodyMediumEmphasized,
+            color = if (todo.isDone) Color.Gray else Color.Unspecified,
             textDecoration = if (todo.isDone) TextDecoration.LineThrough else TextDecoration.None,
             modifier = Modifier
                 .weight(1f)
