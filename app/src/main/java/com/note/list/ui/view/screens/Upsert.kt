@@ -160,7 +160,7 @@ fun Upsert(
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next,
                     keyboardType = KeyboardType.Text,
-                    capitalization = KeyboardCapitalization.Unspecified
+                    capitalization = KeyboardCapitalization.Sentences
                 ),
                 shape = RoundedCornerShape(10.dp),
                 colors = TextFieldDefaults.colors(
@@ -195,7 +195,7 @@ fun Upsert(
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done,
                     keyboardType = KeyboardType.Text,
-                    capitalization = KeyboardCapitalization.Unspecified
+                    capitalization = KeyboardCapitalization.Sentences
                 ),
                 keyboardActions = KeyboardActions {
                     focusManager.clearFocus(true)
