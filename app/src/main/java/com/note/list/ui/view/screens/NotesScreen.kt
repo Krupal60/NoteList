@@ -31,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -103,358 +104,363 @@ fun NoteScreen(
             )
         }
     }) { paddingValues ->
-        val notesData = notes.value
-        notesData.onSuccess { notes ->
-            AnimatedContent(notes.isEmpty()) { state ->
-                if (state) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.SpaceAround
-                    ) {
-                        AnimatedVisibility(true) {
-                            Text(
-                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 24.dp),
-                                textAlign = TextAlign.Center,
-                                text = "Nothing Here , Create New Note..",
-                                style = MaterialTheme.typography.headlineSmall
-                            )
+        Surface {
+            val notesData = notes.value
+            notesData.onSuccess { notes ->
+                AnimatedContent(notes.isEmpty()) { state ->
+                    if (state) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(paddingValues),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.SpaceAround
+                        ) {
+                            AnimatedVisibility(true) {
+                                Text(
+                                    modifier = Modifier.padding(
+                                        horizontal = 14.dp,
+                                        vertical = 24.dp
+                                    ),
+                                    textAlign = TextAlign.Center,
+                                    text = "Nothing Here , Create New Note..",
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
 
+                            }
                         }
-                    }
-                } else {
-                    Column(modifier = Modifier.padding(paddingValues)) {
-                        val focusManager = LocalFocusManager.current
-                        var textFieldValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-                            mutableStateOf(TextFieldValue("", TextRange(0, 0)))
-                        }
-                        val searchText = textFieldValue.text.replace(" ", "")
-                        val filteredNotes by remember(textFieldValue, notes) {
-                            derivedStateOf {
-                                if (searchText.isBlank()) {
-                                    notes
-                                } else {
-                                    notes.filter { note ->
-                                        val title = note.title.replace(" ", "")
-                                        val description = note.description.replace(" ", "")
-                                        title.contains(
-                                            searchText, ignoreCase = true
-                                        ) || description.contains(
-                                            searchText, ignoreCase = true
-                                        ) || title.startsWith(
-                                            searchText, ignoreCase = true
-                                        ) || description.startsWith(
-                                            searchText, ignoreCase = true
-                                        )
+                    } else {
+                        Column(modifier = Modifier.padding(paddingValues)) {
+                            val focusManager = LocalFocusManager.current
+                            var textFieldValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+                                mutableStateOf(TextFieldValue("", TextRange(0, 0)))
+                            }
+                            val searchText = textFieldValue.text.replace(" ", "")
+                            val filteredNotes by remember(textFieldValue, notes) {
+                                derivedStateOf {
+                                    if (searchText.isBlank()) {
+                                        notes
+                                    } else {
+                                        notes.filter { note ->
+                                            val title = note.title.replace(" ", "")
+                                            val description = note.description.replace(" ", "")
+                                            title.contains(
+                                                searchText, ignoreCase = true
+                                            ) || description.contains(
+                                                searchText, ignoreCase = true
+                                            ) || title.startsWith(
+                                                searchText, ignoreCase = true
+                                            ) || description.startsWith(
+                                                searchText, ignoreCase = true
+                                            )
 
+                                        }
                                     }
                                 }
                             }
-                        }
-                        TextField(
-                            value = textFieldValue,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 12.dp),
-                            onValueChange = {
-                                textFieldValue = textFieldValue.copy(
-                                    text = it.text, selection = it.selection
-                                )
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Rounded.Search, contentDescription = "Search Icon"
-                                )
-                            },
-                            placeholder = {
-                                Text(
-                                    text = "Search Notes",
-                                    style = MaterialTheme.typography.bodyMediumEmphasized
-                                )
-                            },
-                            singleLine = true,
-                            shape = RoundedCornerShape(10.dp),
-                            colors = TextFieldDefaults.colors(
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent,
-                                disabledIndicatorColor = Color.Transparent,
-                                errorIndicatorColor = Color.Transparent,
-                                errorContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                cursorColor = MaterialTheme.colorScheme.primary
-                            ),
-                            isError = filteredNotes.isEmpty() && textFieldValue.text.isNotEmpty(),
-                            supportingText = if (filteredNotes.isEmpty() && textFieldValue.text.isNotEmpty()) {
-                                {
-                                    Text(
-                                        text = "No Notes found for ${textFieldValue.text}",
-                                        style = MaterialTheme.typography.bodyMediumEmphasized,
-                                        color = MaterialTheme.colorScheme.error
+                            TextField(
+                                value = textFieldValue,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 12.dp),
+                                onValueChange = {
+                                    textFieldValue = textFieldValue.copy(
+                                        text = it.text, selection = it.selection
                                     )
-                                }
-                            } else null,
-                            trailingIcon = {
-                                AnimatedVisibility(
-                                    textFieldValue.text.isNotEmpty()
-                                ) {
-                                    IconButton(onClick = {
-                                        textFieldValue = textFieldValue.copy(
-                                            "", TextRange(0, 0)
-                                        )
-                                    }) {
-                                        Icon(
-                                            Icons.Rounded.Clear, contentDescription = "Clear Icon"
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Rounded.Search, contentDescription = "Search Icon"
+                                    )
+                                },
+                                placeholder = {
+                                    Text(
+                                        text = "Search Notes",
+                                        style = MaterialTheme.typography.bodyMediumEmphasized
+                                    )
+                                },
+                                singleLine = true,
+                                shape = RoundedCornerShape(10.dp),
+                                colors = TextFieldDefaults.colors(
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                    disabledIndicatorColor = Color.Transparent,
+                                    errorIndicatorColor = Color.Transparent,
+                                    errorContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                    cursorColor = MaterialTheme.colorScheme.primary
+                                ),
+                                isError = filteredNotes.isEmpty() && textFieldValue.text.isNotEmpty(),
+                                supportingText = if (filteredNotes.isEmpty() && textFieldValue.text.isNotEmpty()) {
+                                    {
+                                        Text(
+                                            text = "No Notes found for ${textFieldValue.text}",
+                                            style = MaterialTheme.typography.bodyMediumEmphasized,
+                                            color = MaterialTheme.colorScheme.error
                                         )
                                     }
-                                }
-                            },
-                            textStyle = MaterialTheme.typography.bodyMediumEmphasized,
-                            keyboardOptions = KeyboardOptions(
-                                capitalization = KeyboardCapitalization.Sentences,
-                                keyboardType = KeyboardType.Text,
-                                imeAction = ImeAction.Search
-                            ),
-                            keyboardActions = KeyboardActions {
-                                focusManager.clearFocus(true)
-                            })
-                        Spacer(modifier = Modifier.padding(top = 6.dp))
-                        LazyVerticalStaggeredGrid(
-                            columns = StaggeredGridCells.Fixed(2),
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(
-                                top = 12.dp, bottom = 100.dp, start = 12.dp, end = 12.dp
-                            ),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalItemSpacing = 12.dp,
-                        ) {
-                            items(filteredNotes, key = { it.id }) { note ->
-                                val currentSearchText = textFieldValue.text.replace(" ", "")
-                                    .trim() // Use space-removed text
-                                ElevatedCard(
-                                    modifier = Modifier.animateItem(),
-                                    shape = RoundedCornerShape(10.dp),
-                                    colors = CardDefaults.elevatedCardColors(
-                                        containerColor = MaterialTheme.colorScheme.surfaceContainer
-                                    ),
-                                    onClick = {
-                                        onItemClick(note.id)
-                                    }) {
-
-                                    Column(
-                                        modifier = Modifier.padding(
-                                            vertical = 10.dp, horizontal = 12.dp
-                                        ),
-                                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                                        horizontalAlignment = Alignment.Start
+                                } else null,
+                                trailingIcon = {
+                                    AnimatedVisibility(
+                                        textFieldValue.text.isNotEmpty()
                                     ) {
-                                        val titleVisible = note.title.isNotEmpty()
-                                        AnimatedVisibility(visible = titleVisible) {
-                                            // THIS IS THE KEY CHANGE for currentSearchText
-
-                                            val originalTitle = note.title.trim()
-
-                                            val titleAnnotatedString = buildAnnotatedString {
-                                                append(originalTitle) // Append the original text with spaces
-
-                                                if (currentSearchText.isNotEmpty() && originalTitle.isNotEmpty()) {
-
-                                                    val originalDescriptionSpaceless =
-                                                        originalTitle.replace(" ", "")
-                                                    var searchStartInSpaceless = 0
-
-                                                    while (searchStartInSpaceless < originalDescriptionSpaceless.length) {
-                                                        val foundIdxInSpaceless =
-                                                            originalDescriptionSpaceless.indexOf(
-                                                                currentSearchText,
-                                                                searchStartInSpaceless,
-                                                                ignoreCase = true
-                                                            )
-
-                                                        if (foundIdxInSpaceless == -1) break
-
-                                                        var originalStartIdx = -1
-                                                        var originalEndIdx = -1
-                                                        var nonSpaceCount = 0
-                                                        var originalIteratorIdx = 0
-
-                                                        while (originalIteratorIdx < originalTitle.length) {
-                                                            if (originalTitle[originalIteratorIdx] != ' ') {
-                                                                if (nonSpaceCount == foundIdxInSpaceless) {
-                                                                    originalStartIdx =
-                                                                        originalIteratorIdx
-                                                                    break
-                                                                }
-                                                                nonSpaceCount++
-                                                            }
-                                                            originalIteratorIdx++
-                                                        }
-                                                        if (foundIdxInSpaceless == 0 && originalStartIdx == -1) {
-                                                            originalStartIdx = 0
-                                                            while (originalStartIdx < originalTitle.length && originalTitle[originalStartIdx] == ' ') {
-                                                                originalStartIdx++
-                                                            }
-                                                            if (originalStartIdx >= originalTitle.length && currentSearchText.isNotEmpty()) originalStartIdx =
-                                                                -1 // only spaces
-                                                        }
-
-                                                        if (originalStartIdx != -1) {
-                                                            nonSpaceCount = 0
-                                                            originalIteratorIdx = originalStartIdx
-                                                            while (originalIteratorIdx < originalTitle.length && nonSpaceCount < currentSearchText.length) {
-                                                                if (originalTitle[originalIteratorIdx] != ' ') {
-                                                                    nonSpaceCount++
-                                                                }
-                                                                originalIteratorIdx++
-                                                            }
-                                                            if (nonSpaceCount == currentSearchText.length) {
-                                                                originalEndIdx = originalIteratorIdx
-                                                            }
-                                                        }
-
-                                                        if (originalStartIdx != -1 && originalEndIdx != -1 && originalStartIdx < originalEndIdx) {
-                                                            addStyle(
-                                                                style = SpanStyle(background = MaterialTheme.colorScheme.primaryContainer),
-                                                                start = originalStartIdx,
-                                                                end = originalEndIdx
-                                                            )
-                                                        }
-
-                                                        searchStartInSpaceless =
-                                                            foundIdxInSpaceless + currentSearchText.length
-                                                        if (searchStartInSpaceless <= foundIdxInSpaceless) {
-                                                            searchStartInSpaceless =
-                                                                foundIdxInSpaceless + 1
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            Text(
-                                                text = titleAnnotatedString,
-                                                textAlign = TextAlign.Justify,
-                                                style = MaterialTheme.typography.titleMediumEmphasized.copy(
-                                                    textAlign = TextAlign.Justify,
-                                                    fontWeight = FontWeight.SemiBold
-                                                ),
-                                                maxLines = 2,
-                                                overflow = TextOverflow.Ellipsis,
-                                                modifier = Modifier.fillMaxWidth()
+                                        IconButton(onClick = {
+                                            textFieldValue = textFieldValue.copy(
+                                                "", TextRange(0, 0)
                                             )
-                                            Spacer(modifier = Modifier.padding(vertical = 8.dp))
-                                        }
-                                        val descriptionVisible = note.description.isNotEmpty()
-                                        AnimatedVisibility(visible = descriptionVisible) {
-                                            // THIS IS THE KEY CHANGE for currentSearchText
-                                            val originalDescription = note.description.trim()
-
-                                            val descriptionAnnotatedString = buildAnnotatedString {
-                                                append(originalDescription) // Append the original text with spaces
-
-                                                if (currentSearchText.isNotEmpty() && originalDescription.isNotEmpty()) {
-
-                                                    val originalDescriptionSpaceless =
-                                                        originalDescription.replace(" ", "")
-                                                    var searchStartInSpaceless = 0
-
-                                                    while (searchStartInSpaceless < originalDescriptionSpaceless.length) {
-                                                        val foundIdxInSpaceless =
-                                                            originalDescriptionSpaceless.indexOf(
-                                                                currentSearchText,
-                                                                searchStartInSpaceless,
-                                                                ignoreCase = true
-                                                            )
-
-                                                        if (foundIdxInSpaceless == -1) break
-
-                                                        var originalStartIdx = -1
-                                                        var originalEndIdx = -1
-                                                        var nonSpaceCount = 0
-                                                        var originalIteratorIdx = 0
-
-                                                        while (originalIteratorIdx < originalDescription.length) {
-                                                            if (originalDescription[originalIteratorIdx] != ' ') {
-                                                                if (nonSpaceCount == foundIdxInSpaceless) {
-                                                                    originalStartIdx =
-                                                                        originalIteratorIdx
-                                                                    break
-                                                                }
-                                                                nonSpaceCount++
-                                                            }
-                                                            originalIteratorIdx++
-                                                        }
-                                                        if (foundIdxInSpaceless == 0 && originalStartIdx == -1) {
-                                                            originalStartIdx = 0
-                                                            while (originalStartIdx < originalDescription.length && originalDescription[originalStartIdx] == ' ') {
-                                                                originalStartIdx++
-                                                            }
-                                                            if (originalStartIdx >= originalDescription.length && currentSearchText.isNotEmpty()) originalStartIdx =
-                                                                -1 // only spaces
-                                                        }
-
-                                                        if (originalStartIdx != -1) {
-                                                            nonSpaceCount = 0
-                                                            originalIteratorIdx = originalStartIdx
-                                                            while (originalIteratorIdx < originalDescription.length && nonSpaceCount < currentSearchText.length) {
-                                                                if (originalDescription[originalIteratorIdx] != ' ') {
-                                                                    nonSpaceCount++
-                                                                }
-                                                                originalIteratorIdx++
-                                                            }
-                                                            if (nonSpaceCount == currentSearchText.length) {
-                                                                originalEndIdx = originalIteratorIdx
-                                                            }
-                                                        }
-
-                                                        if (originalStartIdx != -1 && originalEndIdx != -1 && originalStartIdx < originalEndIdx) {
-                                                            addStyle(
-                                                                style = SpanStyle(background = MaterialTheme.colorScheme.primaryContainer),
-                                                                start = originalStartIdx,
-                                                                end = originalEndIdx
-                                                            )
-                                                        }
-
-                                                        searchStartInSpaceless =
-                                                            foundIdxInSpaceless + currentSearchText.length
-                                                        if (searchStartInSpaceless <= foundIdxInSpaceless) {
-                                                            searchStartInSpaceless =
-                                                                foundIdxInSpaceless + 1
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            Text(
-                                                text = descriptionAnnotatedString,
-                                                textAlign = TextAlign.Justify,
-                                                style = MaterialTheme.typography.bodyLargeEmphasized.copy(
-                                                    textAlign = TextAlign.Justify
-                                                ),
-                                                overflow = TextOverflow.Ellipsis,
-                                                maxLines = 10,
-                                                modifier = Modifier.fillMaxWidth()
+                                        }) {
+                                            Icon(
+                                                Icons.Rounded.Clear,
+                                                contentDescription = "Clear Icon"
                                             )
                                         }
                                     }
-                                }
+                                },
+                                textStyle = MaterialTheme.typography.bodyLargeEmphasized,
+                                keyboardOptions = KeyboardOptions(
+                                    capitalization = KeyboardCapitalization.Sentences,
+                                    keyboardType = KeyboardType.Text,
+                                    imeAction = ImeAction.Search
+                                ),
+                                keyboardActions = KeyboardActions {
+                                    focusManager.clearFocus(true)
+                                })
+                            Spacer(modifier = Modifier.padding(top = 6.dp))
+                            LazyVerticalStaggeredGrid(
+                                columns = StaggeredGridCells.Fixed(2),
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(
+                                    top = 12.dp, bottom = 100.dp, start = 12.dp, end = 12.dp
+                                ),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalItemSpacing = 12.dp,
+                            ) {
+                                items(filteredNotes, key = { it.id }) { note ->
+                                    val currentSearchText = textFieldValue.text.replace(" ", "")
+                                        .trim() // Use space-removed text
+                                    ElevatedCard(
+                                        modifier = Modifier.animateItem(),
+                                        shape = RoundedCornerShape(10.dp),
+                                        colors = CardDefaults.elevatedCardColors(
+                                            containerColor = MaterialTheme.colorScheme.surfaceContainer
+                                        ),
+                                        onClick = {
+                                            onItemClick(note.id)
+                                        }) {
 
+                                        Column(
+                                            modifier = Modifier.padding(
+                                                vertical = 10.dp, horizontal = 12.dp
+                                            ),
+                                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                                            horizontalAlignment = Alignment.Start
+                                        ) {
+                                            val titleVisible = note.title.isNotEmpty()
+                                            AnimatedVisibility(visible = titleVisible) {
+                                                // THIS IS THE KEY CHANGE for currentSearchText
+
+                                                val originalTitle = note.title.trim()
+
+                                                val titleAnnotatedString = buildAnnotatedString {
+                                                    append(originalTitle) // Append the original text with spaces
+
+                                                    if (currentSearchText.isNotEmpty() && originalTitle.isNotEmpty()) {
+
+                                                        val originalDescriptionSpaceless =
+                                                            originalTitle.replace(" ", "")
+                                                        var searchStartInSpaceless = 0
+
+                                                        while (searchStartInSpaceless < originalDescriptionSpaceless.length) {
+                                                            val foundIdxInSpaceless =
+                                                                originalDescriptionSpaceless.indexOf(
+                                                                    currentSearchText,
+                                                                    searchStartInSpaceless,
+                                                                    ignoreCase = true
+                                                                )
+
+                                                            if (foundIdxInSpaceless == -1) break
+
+                                                            var originalStartIdx = -1
+                                                            var originalEndIdx = -1
+                                                            var nonSpaceCount = 0
+                                                            var originalIteratorIdx = 0
+
+                                                            while (originalIteratorIdx < originalTitle.length) {
+                                                                if (originalTitle[originalIteratorIdx] != ' ') {
+                                                                    if (nonSpaceCount == foundIdxInSpaceless) {
+                                                                        originalStartIdx =
+                                                                            originalIteratorIdx
+                                                                        break
+                                                                    }
+                                                                    nonSpaceCount++
+                                                                }
+                                                                originalIteratorIdx++
+                                                            }
+                                                            if (foundIdxInSpaceless == 0 && originalStartIdx == -1) {
+                                                                originalStartIdx = 0
+                                                                while (originalStartIdx < originalTitle.length && originalTitle[originalStartIdx] == ' ') {
+                                                                    originalStartIdx++
+                                                                }
+                                                                if (originalStartIdx >= originalTitle.length && currentSearchText.isNotEmpty()) originalStartIdx =
+                                                                    -1 // only spaces
+                                                            }
+
+                                                            if (originalStartIdx != -1) {
+                                                                nonSpaceCount = 0
+                                                                originalIteratorIdx =
+                                                                    originalStartIdx
+                                                                while (originalIteratorIdx < originalTitle.length && nonSpaceCount < currentSearchText.length) {
+                                                                    if (originalTitle[originalIteratorIdx] != ' ') {
+                                                                        nonSpaceCount++
+                                                                    }
+                                                                    originalIteratorIdx++
+                                                                }
+                                                                if (nonSpaceCount == currentSearchText.length) {
+                                                                    originalEndIdx =
+                                                                        originalIteratorIdx
+                                                                }
+                                                            }
+
+                                                            if (originalStartIdx != -1 && originalEndIdx != -1 && originalStartIdx < originalEndIdx) {
+                                                                addStyle(
+                                                                    style = SpanStyle(background = MaterialTheme.colorScheme.primaryContainer),
+                                                                    start = originalStartIdx,
+                                                                    end = originalEndIdx
+                                                                )
+                                                            }
+
+                                                            searchStartInSpaceless =
+                                                                foundIdxInSpaceless + currentSearchText.length
+                                                            if (searchStartInSpaceless <= foundIdxInSpaceless) {
+                                                                searchStartInSpaceless =
+                                                                    foundIdxInSpaceless + 1
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                Text(
+                                                    text = titleAnnotatedString,
+                                                    style = MaterialTheme.typography.titleSmallEmphasized.copy(
+                                                        fontWeight = FontWeight.Bold
+                                                    ),
+                                                    maxLines = 2,
+                                                    overflow = TextOverflow.Ellipsis,
+                                                    modifier = Modifier.fillMaxWidth()
+                                                )
+                                                Spacer(modifier = Modifier.padding(vertical = 8.dp))
+                                            }
+                                            val descriptionVisible = note.description.isNotEmpty()
+                                            AnimatedVisibility(visible = descriptionVisible) {
+                                                // THIS IS THE KEY CHANGE for currentSearchText
+                                                val originalDescription = note.description.trim()
+
+                                                val descriptionAnnotatedString =
+                                                    buildAnnotatedString {
+                                                        append(originalDescription) // Append the original text with spaces
+
+                                                        if (currentSearchText.isNotEmpty() && originalDescription.isNotEmpty()) {
+
+                                                            val originalDescriptionSpaceless =
+                                                                originalDescription.replace(" ", "")
+                                                            var searchStartInSpaceless = 0
+
+                                                            while (searchStartInSpaceless < originalDescriptionSpaceless.length) {
+                                                                val foundIdxInSpaceless =
+                                                                    originalDescriptionSpaceless.indexOf(
+                                                                        currentSearchText,
+                                                                        searchStartInSpaceless,
+                                                                        ignoreCase = true
+                                                                    )
+
+                                                                if (foundIdxInSpaceless == -1) break
+
+                                                                var originalStartIdx = -1
+                                                                var originalEndIdx = -1
+                                                                var nonSpaceCount = 0
+                                                                var originalIteratorIdx = 0
+
+                                                                while (originalIteratorIdx < originalDescription.length) {
+                                                                    if (originalDescription[originalIteratorIdx] != ' ') {
+                                                                        if (nonSpaceCount == foundIdxInSpaceless) {
+                                                                            originalStartIdx =
+                                                                                originalIteratorIdx
+                                                                            break
+                                                                        }
+                                                                        nonSpaceCount++
+                                                                    }
+                                                                    originalIteratorIdx++
+                                                                }
+                                                                if (foundIdxInSpaceless == 0 && originalStartIdx == -1) {
+                                                                    originalStartIdx = 0
+                                                                    while (originalStartIdx < originalDescription.length && originalDescription[originalStartIdx] == ' ') {
+                                                                        originalStartIdx++
+                                                                    }
+                                                                    if (originalStartIdx >= originalDescription.length && currentSearchText.isNotEmpty()) originalStartIdx =
+                                                                        -1 // only spaces
+                                                                }
+
+                                                                if (originalStartIdx != -1) {
+                                                                    nonSpaceCount = 0
+                                                                    originalIteratorIdx =
+                                                                        originalStartIdx
+                                                                    while (originalIteratorIdx < originalDescription.length && nonSpaceCount < currentSearchText.length) {
+                                                                        if (originalDescription[originalIteratorIdx] != ' ') {
+                                                                            nonSpaceCount++
+                                                                        }
+                                                                        originalIteratorIdx++
+                                                                    }
+                                                                    if (nonSpaceCount == currentSearchText.length) {
+                                                                        originalEndIdx =
+                                                                            originalIteratorIdx
+                                                                    }
+                                                                }
+
+                                                                if (originalStartIdx != -1 && originalEndIdx != -1 && originalStartIdx < originalEndIdx) {
+                                                                    addStyle(
+                                                                        style = SpanStyle(background = MaterialTheme.colorScheme.primaryContainer),
+                                                                        start = originalStartIdx,
+                                                                        end = originalEndIdx
+                                                                    )
+                                                                }
+
+                                                                searchStartInSpaceless =
+                                                                    foundIdxInSpaceless + currentSearchText.length
+                                                                if (searchStartInSpaceless <= foundIdxInSpaceless) {
+                                                                    searchStartInSpaceless =
+                                                                        foundIdxInSpaceless + 1
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                Text(
+                                                    text = descriptionAnnotatedString,
+                                                    style = MaterialTheme.typography.bodyLargeEmphasized,
+                                                    overflow = TextOverflow.Ellipsis,
+                                                    maxLines = 10,
+                                                    modifier = Modifier.fillMaxWidth()
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                }
                             }
                         }
                     }
                 }
-            }
-        }.onFailure {
-            // Handle error state, e.g., show an error message
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Failed to load notes: ${it.localizedMessage}")
+            }.onFailure {
+                // Handle error state, e.g., show an error message
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Failed to load notes: ${it.localizedMessage}")
+                }
             }
         }
     }
-
 }

@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -27,10 +28,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -45,6 +51,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.note.list.domain.upsert.OnNoteUpsertAction
 import com.note.list.viewmodel.UpsertViewModel
+import kotlinx.coroutines.delay
 
 @Immutable
 data class UpsertState(
@@ -121,105 +128,118 @@ fun Upsert(
             )
         }
     ) { padding ->
-        val focusManager = LocalFocusManager.current
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Surface {
+            val focusManager = LocalFocusManager.current
+            val descriptionFocusRequester = remember { FocusRequester() }
 
-            TextField(
-                value = state.title,
-                onValueChange = {
-                    onTitleChange(it)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = 12.dp
-                    )
-                    .wrapContentHeight(),
-                textStyle = MaterialTheme.typography.titleMediumEmphasized.copy(
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Justify
-                ),
-                maxLines = 3,
-                placeholder = {
-                    Text(
-                        text = "Enter Title Here...",
-                        style = MaterialTheme.typography.titleMediumEmphasized.copy(
-                            color = MaterialTheme.colorScheme.onSurface.copy(
-                                alpha = 0.7f
-                            ),
-                            textAlign = TextAlign.Justify
-                        )
-                    )
-                },
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next,
-                    keyboardType = KeyboardType.Text,
-                    capitalization = KeyboardCapitalization.Sentences
-                ),
-                shape = RoundedCornerShape(10.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
-                )
-            )
-
-
-            TextField(
-                value = state.description,
-                onValueChange = {
-                    onTextChange(it)
-                },
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .imePadding()
-                    .padding(
-                        horizontal = 12.dp
-                    )
-                    .clip(RoundedCornerShape(10.dp))
-                    .padding(
-                        top = 12.dp
-                    ),
-                textStyle = MaterialTheme.typography.bodyLargeEmphasized.copy(
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Justify
-                ),
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done,
-                    keyboardType = KeyboardType.Text,
-                    capitalization = KeyboardCapitalization.Sentences
-                ),
-                keyboardActions = KeyboardActions {
-                    focusManager.clearFocus(true)
-                },
-                placeholder = {
-                    Text(
-                        text = "Enter your note here...",
-                        style = MaterialTheme.typography.bodyLargeEmphasized.copy(
-                            color = MaterialTheme.colorScheme.onSurface.copy(
-                                alpha = 0.7f
-                            ),
-                            textAlign = TextAlign.Justify
+                    .padding(padding),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                TextField(
+                    value = state.title,
+                    onValueChange = {
+                        onTitleChange(it)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = 12.dp
                         )
+                        .wrapContentHeight(),
+                    textStyle = MaterialTheme.typography.titleMediumEmphasized.copy(
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Justify
+                    ),
+                    maxLines = 3,
+                    placeholder = {
+                        Text(
+                            text = "Enter Title Here...",
+                            style = MaterialTheme.typography.titleMediumEmphasized.copy(
+                                color = MaterialTheme.colorScheme.onSurface.copy(
+                                    alpha = 0.7f
+                                ),
+                                textAlign = TextAlign.Justify
+                            )
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Sentences
+                    ),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent
                     )
-                },
-                shape = RoundedCornerShape(10.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
                 )
-            )
+
+
+                TextField(
+                    value = state.description,
+                    onValueChange = {
+                        onTextChange(it)
+                    },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .focusRequester(descriptionFocusRequester)
+                        .imePadding()
+                        .padding(
+                            horizontal = 12.dp
+                        )
+                        .clip(RoundedCornerShape(10.dp))
+                        .padding(
+                            top = 12.dp
+                        ),
+                    textStyle = MaterialTheme.typography.bodyLargeEmphasized.copy(
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Justify
+                    ),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Sentences
+                    ),
+                    keyboardActions = KeyboardActions {
+                        focusManager.clearFocus(true)
+                    },
+                    placeholder = {
+                        Text(
+                            text = "Enter your note here...",
+                            style = MaterialTheme.typography.bodyLargeEmphasized.copy(
+                                color = MaterialTheme.colorScheme.onSurface.copy(
+                                    alpha = 0.7f
+                                ),
+                                textAlign = TextAlign.Justify
+                            )
+                        )
+                    },
+                    shape = RoundedCornerShape(10.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent
+                    )
+                )
+                val currentDescriptionIsEmpty by rememberUpdatedState(newValue = state.description.isEmpty())
+
+                LaunchedEffect(Unit) {
+                    delay(200)
+                    if (currentDescriptionIsEmpty) {
+                        descriptionFocusRequester.requestFocus()
+                    }
+                }
+            }
         }
     }
 }

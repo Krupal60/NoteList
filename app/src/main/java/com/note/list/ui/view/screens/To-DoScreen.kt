@@ -35,6 +35,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -195,66 +196,40 @@ fun ToDoListScreen(
             }
         }
     ) { paddingValues ->
-
-        AnimatedContent(
-            toDoListResult.getOrThrow().isEmpty() && toDoListDoneResult.getOrThrow().isEmpty()
-        ) { state ->
-            if (state) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceAround
-                ) {
-                    AnimatedVisibility(true) {
-                        Text(
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 24.dp),
-                            textAlign = TextAlign.Center,
-                            text = "Nothing Here , Create New To-Do List..",
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                    }
-                }
-            } else {
-                LazyColumn(
-                    Modifier
-                        .padding(paddingValues)
-                        .fillMaxSize()
-                        .animateContentSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    contentPadding = PaddingValues(top = 12.dp, bottom = 100.dp)
-                ) {
-                    toDoListResult.onSuccess { toDoList ->
-
-                        items(items = toDoList, key = { "todo_${it.id}" }) { todo ->
-                            ElevatedCard(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 12.dp)
-                                    .animateItem()
-                            ) {
-                                ToDoList(todo, onAction)
-                            }
+        Surface {
+            AnimatedContent(
+                toDoListResult.getOrThrow().isEmpty() && toDoListDoneResult.getOrThrow().isEmpty()
+            ) { state ->
+                if (state) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.SpaceAround
+                    ) {
+                        AnimatedVisibility(true) {
+                            Text(
+                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 24.dp),
+                                textAlign = TextAlign.Center,
+                                text = "Nothing Here , Create New To-Do List..",
+                                style = MaterialTheme.typography.headlineSmall
+                            )
                         }
+                    }
+                } else {
+                    LazyColumn(
+                        Modifier
+                            .padding(paddingValues)
+                            .fillMaxSize()
+                            .animateContentSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        contentPadding = PaddingValues(top = 12.dp, bottom = 100.dp)
+                    ) {
+                        toDoListResult.onSuccess { toDoList ->
 
-                        toDoListDoneResult.onSuccess { toDoListDoneItems ->
-
-                            item {
-                                AnimatedVisibility(
-                                    visible = toDoListDoneItems.isNotEmpty()
-                                ) {
-                                    Text(
-                                        text = "Completed",
-                                        modifier = Modifier
-                                            .padding(horizontal = 12.dp)
-                                            .padding(vertical = 14.dp)
-                                    )
-                                }
-                            }
-
-                            items(toDoListDoneItems, key = { "done_${it.id}" }) { todo ->
+                            items(items = toDoList, key = { "todo_${it.id}" }) { todo ->
                                 ElevatedCard(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -265,8 +240,36 @@ fun ToDoListScreen(
                                 }
                             }
 
-                        }
+                            toDoListDoneResult.onSuccess { toDoListDoneItems ->
 
+                                item {
+                                    AnimatedVisibility(
+                                        visible = toDoListDoneItems.isNotEmpty()
+                                    ) {
+                                        Text(
+                                            text = "Completed",
+                                            style = MaterialTheme.typography.titleMediumEmphasized,
+                                            modifier = Modifier
+                                                .padding(horizontal = 12.dp)
+                                                .padding(vertical = 14.dp)
+                                        )
+                                    }
+                                }
+
+                                items(toDoListDoneItems, key = { "done_${it.id}" }) { todo ->
+                                    ElevatedCard(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 12.dp)
+                                            .animateItem()
+                                    ) {
+                                        ToDoList(todo, onAction)
+                                    }
+                                }
+
+                            }
+
+                        }
                     }
                 }
             }
