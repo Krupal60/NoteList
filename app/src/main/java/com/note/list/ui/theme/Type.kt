@@ -4,23 +4,24 @@ import androidx.compose.material3.Typography
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.googlefonts.Font
 import androidx.compose.ui.text.googlefonts.GoogleFont
+import com.note.list.R
 
 val provider = GoogleFont.Provider(
     providerAuthority = "com.google.android.gms.fonts",
     providerPackage = "com.google.android.gms",
-    certificates = com.note.list.R.array.com_google_android_gms_fonts_certs
+    certificates = R.array.com_google_android_gms_fonts_certs
 )
 
 val bodyFontFamily = FontFamily(
     Font(
-        googleFont = GoogleFont("Lato"),
+        googleFont = GoogleFont("Noto Sans"),
         fontProvider = provider,
     )
 )
 
 val displayFontFamily = FontFamily(
     Font(
-        googleFont = GoogleFont("Roboto"),
+        googleFont = GoogleFont("Merriweather"),
         fontProvider = provider,
     )
 )

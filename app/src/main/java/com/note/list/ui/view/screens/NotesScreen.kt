@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -173,12 +174,17 @@ fun NoteScreen(
                                     style = MaterialTheme.typography.bodyMediumEmphasized
                                 )
                             },
+                            singleLine = true,
                             shape = RoundedCornerShape(10.dp),
                             colors = TextFieldDefaults.colors(
                                 focusedIndicatorColor = Color.Transparent,
                                 unfocusedIndicatorColor = Color.Transparent,
                                 disabledIndicatorColor = Color.Transparent,
                                 errorIndicatorColor = Color.Transparent,
+                                errorContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                                 cursorColor = MaterialTheme.colorScheme.primary
                             ),
                             isError = filteredNotes.isEmpty() && textFieldValue.text.isNotEmpty(),
@@ -231,6 +237,9 @@ fun NoteScreen(
                                 ElevatedCard(
                                     modifier = Modifier.animateItem(),
                                     shape = RoundedCornerShape(10.dp),
+                                    colors = CardDefaults.elevatedCardColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                                    ),
                                     onClick = {
                                         onItemClick(note.id)
                                     }) {
