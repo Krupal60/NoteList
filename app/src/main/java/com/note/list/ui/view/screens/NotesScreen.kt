@@ -208,7 +208,7 @@ fun NoteScreen(
                             },
                             textStyle = MaterialTheme.typography.bodyMediumEmphasized,
                             keyboardOptions = KeyboardOptions(
-                                capitalization = KeyboardCapitalization.Words,
+                                capitalization = KeyboardCapitalization.Sentences,
                                 keyboardType = KeyboardType.Text,
                                 imeAction = ImeAction.Search
                             ),
