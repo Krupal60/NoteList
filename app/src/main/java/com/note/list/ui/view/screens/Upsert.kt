@@ -2,17 +2,14 @@ package com.note.list.ui.view.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -35,10 +32,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -122,11 +121,7 @@ fun Upsert(
             )
         }
     ) { padding ->
-        val layoutDirection = LocalLayoutDirection.current
-        val displayCutout = WindowInsets.displayCutout.asPaddingValues()
-        val startPadding = displayCutout.calculateStartPadding(layoutDirection)
-        val endPadding = displayCutout.calculateEndPadding(layoutDirection)
-
+        val focusManager = LocalFocusManager.current
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -145,11 +140,7 @@ fun Upsert(
                     .padding(
                         horizontal = 12.dp
                     )
-                    .wrapContentHeight()
-                    .padding(
-                        start = startPadding.coerceAtLeast(6.dp),
-                        end = endPadding.coerceAtLeast(6.dp)
-                    ),
+                    .wrapContentHeight(),
                 textStyle = MaterialTheme.typography.titleMediumEmphasized.copy(
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Justify
@@ -166,6 +157,11 @@ fun Upsert(
                         )
                     )
                 },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next,
+                    keyboardType = KeyboardType.Text,
+                    capitalization = KeyboardCapitalization.Unspecified
+                ),
                 shape = RoundedCornerShape(10.dp),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -191,16 +187,19 @@ fun Upsert(
                     .clip(RoundedCornerShape(10.dp))
                     .padding(
                         top = 12.dp
-                    )
-                    .padding(
-                        start = startPadding.coerceAtLeast(6.dp),
-                        end = endPadding.coerceAtLeast(6.dp)
                     ),
-
                 textStyle = MaterialTheme.typography.bodyLargeEmphasized.copy(
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Justify
                 ),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done,
+                    keyboardType = KeyboardType.Text,
+                    capitalization = KeyboardCapitalization.Unspecified
+                ),
+                keyboardActions = KeyboardActions {
+                    focusManager.clearFocus(true)
+                },
                 placeholder = {
                     Text(
                         text = "Enter your note here...",

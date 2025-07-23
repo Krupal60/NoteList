@@ -58,7 +58,7 @@ class UpsertViewModel @Inject constructor(
     private fun upsertNote() {
         val valueChanged =
             state.value.title != result?.title || state.value.description != result?.description
-        if (valueChanged && state.value.title.isNotBlank() && state.value.description.isNotBlank()) {
+        if (valueChanged && state.value.title.isNotBlank() || state.value.description.isNotBlank()) {
             viewModelScope.launch {
                 repository.upsert(
                     Note(
