@@ -35,6 +35,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -150,7 +151,8 @@ fun Upsert(
                         .padding(
                             horizontal = 12.dp
                         )
-                        .wrapContentHeight(),
+                        .wrapContentHeight()
+                        .shadow(1.dp, RoundedCornerShape(10.dp)),
                     textStyle = MaterialTheme.typography.titleMediumEmphasized.copy(
                         color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Justify
@@ -198,7 +200,8 @@ fun Upsert(
                         .clip(RoundedCornerShape(10.dp))
                         .padding(
                             top = 12.dp
-                        ),
+                        )
+                        .shadow(1.dp, RoundedCornerShape(10.dp)),
                     textStyle = MaterialTheme.typography.bodyLargeEmphasized.copy(
                         color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Justify
