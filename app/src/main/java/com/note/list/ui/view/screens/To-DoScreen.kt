@@ -19,7 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -35,7 +35,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -73,6 +73,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.note.list.domain.todo.OnToDoAction
 import com.note.list.domain.todo.ToDo
 import com.note.list.ui.view.components.ToDoList
+import com.note.list.ui.view.isScrollingUp
 import com.note.list.viewmodel.ToDoListViewModel
 
 @Immutable
@@ -183,7 +184,7 @@ fun ToDoListScreen(
 
         )
     }
-
+    val lazyListScope = rememberLazyListState()
     Scaffold(topBar = {
         TopAppBar(title = {
             Text(
@@ -191,14 +192,20 @@ fun ToDoListScreen(
             )
         })
     }, floatingActionButton = {
-        FloatingActionButton(
-            shape = CircleShape, onClick = {
+        ExtendedFloatingActionButton(
+            text = {
+                Text(
+                    text = "Add To-Do", style = MaterialTheme.typography.labelLarge
+                )
+            },
+            expanded = lazyListScope.isScrollingUp(),
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Add, contentDescription = "Add To-Do"
+                )
+            }, onClick = {
                 onAction(OnToDoAction.ShowDialog)
-            }) {
-            Icon(
-                imageVector = Icons.Filled.Add, contentDescription = "Add Note"
-            )
-        }
+            })
     }) { paddingValues ->
         Surface {
             AnimatedContent(
@@ -326,6 +333,7 @@ fun ToDoListScreen(
                             Modifier
                                 .fillMaxSize()
                                 .animateContentSize(),
+                            state = lazyListScope,
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(10.dp),
                             contentPadding = PaddingValues(top = 12.dp, bottom = 100.dp)

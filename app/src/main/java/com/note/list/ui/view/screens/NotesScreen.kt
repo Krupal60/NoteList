@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -26,7 +26,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.note.list.domain.note.Note
+import com.note.list.ui.view.isScrollingUp
 import com.note.list.viewmodel.NoteViewModel
 
 @Composable
@@ -88,6 +89,7 @@ fun NoteScreenMain(
 fun NoteScreen(
     notes: State<Result<List<Note>>>, onFloatButtonClick: () -> Unit, onItemClick: (Int) -> Unit
 ) {
+    val lazyGridState = rememberLazyStaggeredGridState()
     Scaffold(topBar = {
         TopAppBar(title = {
             Text(
@@ -95,14 +97,21 @@ fun NoteScreen(
             )
         })
     }, floatingActionButton = {
-        FloatingActionButton(
-            shape = CircleShape, onClick = {
+        ExtendedFloatingActionButton(
+            text = {
+                Text(
+                    text = "Add Note", style = MaterialTheme.typography.labelLarge
+                )
+            },
+            expanded = lazyGridState.isScrollingUp(),
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Add, contentDescription = "Add Note"
+                )
+            },
+            onClick = {
                 onFloatButtonClick()
-            }) {
-            Icon(
-                imageVector = Icons.Filled.Add, contentDescription = "Add Note"
-            )
-        }
+            })
     }) { paddingValues ->
         Surface {
             val notesData = notes.value
@@ -230,6 +239,7 @@ fun NoteScreen(
                                 })
                             Spacer(modifier = Modifier.padding(top = 4.dp))
                             LazyVerticalStaggeredGrid(
+                                state = lazyGridState,
                                 columns = StaggeredGridCells.Fixed(2),
                                 modifier = Modifier.fillMaxSize(),
                                 contentPadding = PaddingValues(

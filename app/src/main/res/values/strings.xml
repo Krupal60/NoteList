@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">NoteList</string>
+    <string name="toggle_menu">Toggle menu</string>
 </resources>
