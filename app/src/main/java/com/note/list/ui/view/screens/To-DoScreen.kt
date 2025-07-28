@@ -7,10 +7,13 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,33 +25,46 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.rounded.Clear
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonShapes
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -70,10 +86,16 @@ data class ToDoState(
 
 @Composable
 fun ToDoListScreenMain(viewModel: ToDoListViewModel = hiltViewModel()) {
-    val toDoList by
-    viewModel.todo.collectAsStateWithLifecycle(initialValue = Result.success(emptyList()))
-    val toDoListDone by
-    viewModel.todoDone.collectAsStateWithLifecycle(initialValue = Result.success(emptyList()))
+    val toDoList by viewModel.todo.collectAsStateWithLifecycle(
+        initialValue = Result.success(
+            emptyList()
+        )
+    )
+    val toDoListDone by viewModel.todoDone.collectAsStateWithLifecycle(
+        initialValue = Result.success(
+            emptyList()
+        )
+    )
     val state by viewModel.state.collectAsStateWithLifecycle()
     ToDoListScreen(toDoList, toDoListDone, state, viewModel::onAction)
 }
@@ -81,7 +103,8 @@ fun ToDoListScreenMain(viewModel: ToDoListViewModel = hiltViewModel()) {
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalFoundationApi::class,
-    ExperimentalAnimationApi::class, ExperimentalMaterial3ExpressiveApi::class
+    ExperimentalAnimationApi::class,
+    ExperimentalMaterial3ExpressiveApi::class
 )
 @Composable
 fun ToDoListScreen(
@@ -93,109 +116,90 @@ fun ToDoListScreen(
     val context = LocalContext.current
 
     if (state.showDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                onAction(OnToDoAction.HideDialog)
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        if (state.description.length > 280) {
-                            Toast.makeText(context, "Only 280 words allow", Toast.LENGTH_SHORT)
-                                .show()
-                        } else {
-                            onAction(OnToDoAction.Upsert)
-                            onAction(OnToDoAction.HideDialog)
-                        }
-                    },
-                    shapes = ButtonShapes(
-                        shape = ButtonDefaults.shape,
-                        pressedShape = RoundedCornerShape(8.dp)
-                    )
-
-                ) {
-                    Text(text = if (state.id == 0) "Save" else "Update")
-                }
-
-            },
-            dismissButton = {
-                OutlinedButton(
-                    onClick = { onAction(OnToDoAction.HideDialog) },
-                    shapes = ButtonShapes(
-                        shape = ButtonDefaults.shape,
-                        pressedShape = RoundedCornerShape(8.dp)
-                    )
-                ) {
-                    Text(text = "Cancel")
-                }
-
-
-            },
-            title = {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(text = "TO-Do List")
-
-                }
-            },
-            text = {
-                OutlinedTextField(
-                    value = state.description,
-                    onValueChange = {
-                        onAction(OnToDoAction.UpdateDescription(it))
-                    },
-                    maxLines = 7,
-                    isError = state.description.length > 280,
-                    placeholder = {
-                        Text(text = "Add Description")
-                    },
-                    textStyle = MaterialTheme.typography.bodyMediumEmphasized,
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Words,
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions {
-                        if (state.description.length > 280) {
-                            Toast.makeText(context, "Only 280 words allow", Toast.LENGTH_SHORT)
-                                .show()
-                        } else {
-                            onAction(OnToDoAction.Upsert)
-                            onAction(OnToDoAction.HideDialog)
-                        }
+        AlertDialog(onDismissRequest = {
+            onAction(OnToDoAction.HideDialog)
+        }, confirmButton = {
+            Button(
+                onClick = {
+                    if (state.description.length > 280) {
+                        Toast.makeText(context, "Only 280 words allow", Toast.LENGTH_SHORT).show()
+                    } else {
+                        onAction(OnToDoAction.Upsert)
+                        onAction(OnToDoAction.HideDialog)
                     }
+                }, shapes = ButtonShapes(
+                    shape = ButtonDefaults.shape, pressedShape = RoundedCornerShape(8.dp)
                 )
+
+            ) {
+                Text(text = if (state.id == 0) "Save" else "Update")
             }
+
+        }, dismissButton = {
+            OutlinedButton(
+                onClick = { onAction(OnToDoAction.HideDialog) }, shapes = ButtonShapes(
+                    shape = ButtonDefaults.shape, pressedShape = RoundedCornerShape(8.dp)
+                )
+            ) {
+                Text(text = "Cancel")
+            }
+
+
+        }, title = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(text = "TO-Do List")
+
+            }
+        }, text = {
+            OutlinedTextField(
+                value = state.description,
+                onValueChange = {
+                    onAction(OnToDoAction.UpdateDescription(it))
+                },
+                maxLines = 7,
+                isError = state.description.length > 280,
+                placeholder = {
+                    Text(text = "Add Description")
+                },
+                textStyle = MaterialTheme.typography.bodyMediumEmphasized,
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions {
+                    if (state.description.length > 280) {
+                        Toast.makeText(context, "Only 280 words allow", Toast.LENGTH_SHORT).show()
+                    } else {
+                        onAction(OnToDoAction.Upsert)
+                        onAction(OnToDoAction.HideDialog)
+                    }
+                })
+        }
 
         )
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(title = {
-                Text(
-                    text = "To-Do List",
-                    style = MaterialTheme.typography.titleLarge
-                )
-            })
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                shape = CircleShape,
-                onClick = {
-                    onAction(OnToDoAction.ShowDialog)
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "Add Note"
-                )
-            }
+    Scaffold(topBar = {
+        TopAppBar(title = {
+            Text(
+                text = "To-Do List", style = MaterialTheme.typography.titleLarge
+            )
+        })
+    }, floatingActionButton = {
+        FloatingActionButton(
+            shape = CircleShape, onClick = {
+                onAction(OnToDoAction.ShowDialog)
+            }) {
+            Icon(
+                imageVector = Icons.Filled.Add, contentDescription = "Add Note"
+            )
         }
-    ) { paddingValues ->
+    }) { paddingValues ->
         Surface {
             AnimatedContent(
                 toDoListResult.getOrThrow().isEmpty() && toDoListDoneResult.getOrThrow().isEmpty()
@@ -218,57 +222,168 @@ fun ToDoListScreen(
                         }
                     }
                 } else {
-                    LazyColumn(
-                        Modifier
-                            .padding(paddingValues)
-                            .fillMaxSize()
-                            .animateContentSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                        contentPadding = PaddingValues(top = 12.dp, bottom = 100.dp)
+                    val focusManager = LocalFocusManager.current
+                    var textFieldValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+                        mutableStateOf(TextFieldValue("", TextRange(0, 0)))
+                    }
+                    val searchText = textFieldValue.text.replace(" ", "")
+                    val filteredTodoList by remember(
+                        textFieldValue,
+                        toDoListResult,
+                        toDoListDoneResult
                     ) {
-                        toDoListResult.onSuccess { toDoList ->
+                        derivedStateOf {
+                            if (searchText.isBlank()) {
+                                toDoListResult.getOrThrow() + toDoListDoneResult.getOrThrow()
+                            } else {
+                                val mergeList =
+                                    toDoListResult.getOrThrow() + toDoListDoneResult.getOrThrow()
+                                mergeList.filter { toDo ->
+                                    val description = toDo.description.replace(" ", "")
+                                    description.contains(
+                                        searchText, ignoreCase = true
+                                    ) || description.startsWith(
+                                        searchText, ignoreCase = true
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    Column(modifier = Modifier.padding(paddingValues)) {
+                        TextField(
+                            value = textFieldValue,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp),
+                            onValueChange = {
+                                textFieldValue = textFieldValue.copy(
+                                    text = it.text, selection = it.selection
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Rounded.Search, contentDescription = "Search Icon"
+                                )
+                            },
+                            placeholder = {
+                                Text(
+                                    text = "Search Todos...",
+                                    style = MaterialTheme.typography.bodyMediumEmphasized
+                                )
+                            },
+                            singleLine = true,
+                            shape = RoundedCornerShape(8.dp),
+                            colors = TextFieldDefaults.colors(
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                disabledIndicatorColor = Color.Transparent,
+                                errorIndicatorColor = Color.Transparent,
+                                errorContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                cursorColor = MaterialTheme.colorScheme.primary
+                            ),
+                            isError = filteredTodoList.isEmpty() && textFieldValue.text.isNotEmpty(),
+                            supportingText = if (filteredTodoList.isEmpty() && textFieldValue.text.isNotEmpty()) {
+                                {
+                                    Text(
+                                        text = "No Notes found for ${textFieldValue.text}",
+                                        style = MaterialTheme.typography.bodyMediumEmphasized,
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                }
+                            } else null,
+                            trailingIcon = {
+                                AnimatedVisibility(
+                                    textFieldValue.text.isNotEmpty()
+                                ) {
+                                    IconButton(onClick = {
+                                        textFieldValue = textFieldValue.copy(
+                                            "", TextRange(0, 0)
+                                        )
+                                        focusManager.clearFocus(true)
+                                    }) {
+                                        Icon(
+                                            Icons.Rounded.Clear, contentDescription = "Clear Icon"
+                                        )
+                                    }
+                                }
+                            },
+                            textStyle = MaterialTheme.typography.bodyLargeEmphasized,
+                            keyboardOptions = KeyboardOptions(
+                                capitalization = KeyboardCapitalization.Sentences,
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Search
+                            ),
+                            keyboardActions = KeyboardActions {
+                                focusManager.clearFocus(true)
+                            })
 
-                            items(items = toDoList, key = { "todo_${it.id}" }) { todo ->
+                        Spacer(modifier = Modifier.padding(top = 4.dp))
+
+                        LazyColumn(
+                            Modifier
+                                .fillMaxSize()
+                                .animateContentSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            contentPadding = PaddingValues(top = 12.dp, bottom = 100.dp)
+                        ) {
+
+                            items(
+                                items = filteredTodoList.filterNot { it.isDone },
+                                key = { "todo_${it.id}" }) { todo ->
                                 ElevatedCard(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(horizontal = 12.dp)
-                                        .animateItem()
+                                        .animateItem(),
+                                    shape = RoundedCornerShape(8.dp),
+                                    colors = CardDefaults.elevatedCardColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                                    ),
                                 ) {
-                                    ToDoList(todo, onAction)
+                                    ToDoList(todo, searchText.trim(), onAction)
                                 }
                             }
 
-                            toDoListDoneResult.onSuccess { toDoListDoneItems ->
-
-                                item {
-                                    AnimatedVisibility(
-                                        visible = toDoListDoneItems.isNotEmpty()
+                            if (filteredTodoList.any { it.isDone }) {
+                                stickyHeader {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(MaterialTheme.colorScheme.surface),
+                                        contentAlignment = Alignment.Center
                                     ) {
                                         Text(
                                             text = "Completed",
                                             style = MaterialTheme.typography.titleMediumEmphasized,
                                             modifier = Modifier
+                                                .animateItem()
                                                 .padding(horizontal = 12.dp)
                                                 .padding(vertical = 14.dp)
                                         )
                                     }
                                 }
-
-                                items(toDoListDoneItems, key = { "done_${it.id}" }) { todo ->
-                                    ElevatedCard(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 12.dp)
-                                            .animateItem()
-                                    ) {
-                                        ToDoList(todo, onAction)
-                                    }
-                                }
-
                             }
 
+                            items(
+                                filteredTodoList.filter { it.isDone },
+                                key = { "done_${it.id}" }) { todo ->
+                                ElevatedCard(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 12.dp)
+                                        .animateItem(),
+                                    shape = RoundedCornerShape(8.dp),
+                                    colors = CardDefaults.elevatedCardColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                                    ),
+                                ) {
+                                    ToDoList(todo, searchText.trim(), onAction)
+                                }
+                            }
                         }
                     }
                 }
@@ -290,8 +405,7 @@ fun ToDoListScreenPreview() {
                         description = "Buy groceries",
                         lastUpdated = System.currentTimeMillis(),
                         isDone = false
-                    ),
-                    ToDo(
+                    ), ToDo(
                         id = 2,
                         description = "Walk the dog",
                         lastUpdated = System.currentTimeMillis(),

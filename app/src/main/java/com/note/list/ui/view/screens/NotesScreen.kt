@@ -175,12 +175,12 @@ fun NoteScreen(
                                 },
                                 placeholder = {
                                     Text(
-                                        text = "Search Notes",
+                                        text = "Search Notes...",
                                         style = MaterialTheme.typography.bodyMediumEmphasized
                                     )
                                 },
                                 singleLine = true,
-                                shape = RoundedCornerShape(10.dp),
+                                shape = RoundedCornerShape(8.dp),
                                 colors = TextFieldDefaults.colors(
                                     focusedIndicatorColor = Color.Transparent,
                                     unfocusedIndicatorColor = Color.Transparent,
@@ -210,6 +210,7 @@ fun NoteScreen(
                                             textFieldValue = textFieldValue.copy(
                                                 "", TextRange(0, 0)
                                             )
+                                            focusManager.clearFocus(true)
                                         }) {
                                             Icon(
                                                 Icons.Rounded.Clear,
@@ -227,7 +228,7 @@ fun NoteScreen(
                                 keyboardActions = KeyboardActions {
                                     focusManager.clearFocus(true)
                                 })
-                            Spacer(modifier = Modifier.padding(top = 6.dp))
+                            Spacer(modifier = Modifier.padding(top = 4.dp))
                             LazyVerticalStaggeredGrid(
                                 columns = StaggeredGridCells.Fixed(2),
                                 modifier = Modifier.fillMaxSize(),
@@ -242,7 +243,7 @@ fun NoteScreen(
                                         .trim() // Use space-removed text
                                     ElevatedCard(
                                         modifier = Modifier.animateItem(),
-                                        shape = RoundedCornerShape(10.dp),
+                                        shape = RoundedCornerShape(8.dp),
                                         colors = CardDefaults.elevatedCardColors(
                                             containerColor = MaterialTheme.colorScheme.surfaceContainer
                                         ),
@@ -351,6 +352,7 @@ fun NoteScreen(
                                                 )
                                                 Spacer(modifier = Modifier.padding(vertical = 8.dp))
                                             }
+
                                             val descriptionVisible = note.description.isNotEmpty()
                                             AnimatedVisibility(visible = descriptionVisible) {
                                                 // THIS IS THE KEY CHANGE for currentSearchText

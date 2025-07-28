@@ -19,6 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,8 +32,89 @@ import com.note.list.domain.todo.ToDo
 @Composable
 fun ToDoList(
     todo: ToDo,
+    currentSearchText: String,
     onAction: (OnToDoAction) -> Unit
 ) {
+
+    val originalTitle = todo.description.trim()
+
+    val titleAnnotatedString = buildAnnotatedString {
+        append(originalTitle) // Append the original text with spaces
+
+        if (currentSearchText.isNotEmpty() && originalTitle.isNotEmpty()) {
+
+            val originalDescriptionSpaceless =
+                originalTitle.replace(" ", "")
+            var searchStartInSpaceless = 0
+
+            while (searchStartInSpaceless < originalDescriptionSpaceless.length) {
+                val foundIdxInSpaceless =
+                    originalDescriptionSpaceless.indexOf(
+                        currentSearchText,
+                        searchStartInSpaceless,
+                        ignoreCase = true
+                    )
+
+                if (foundIdxInSpaceless == -1) break
+
+                var originalStartIdx = -1
+                var originalEndIdx = -1
+                var nonSpaceCount = 0
+                var originalIteratorIdx = 0
+
+                while (originalIteratorIdx < originalTitle.length) {
+                    if (originalTitle[originalIteratorIdx] != ' ') {
+                        if (nonSpaceCount == foundIdxInSpaceless) {
+                            originalStartIdx =
+                                originalIteratorIdx
+                            break
+                        }
+                        nonSpaceCount++
+                    }
+                    originalIteratorIdx++
+                }
+                if (foundIdxInSpaceless == 0 && originalStartIdx == -1) {
+                    originalStartIdx = 0
+                    while (originalStartIdx < originalTitle.length && originalTitle[originalStartIdx] == ' ') {
+                        originalStartIdx++
+                    }
+                    if (originalStartIdx >= originalTitle.length && currentSearchText.isNotEmpty()) originalStartIdx =
+                        -1 // only spaces
+                }
+
+                if (originalStartIdx != -1) {
+                    nonSpaceCount = 0
+                    originalIteratorIdx =
+                        originalStartIdx
+                    while (originalIteratorIdx < originalTitle.length && nonSpaceCount < currentSearchText.length) {
+                        if (originalTitle[originalIteratorIdx] != ' ') {
+                            nonSpaceCount++
+                        }
+                        originalIteratorIdx++
+                    }
+                    if (nonSpaceCount == currentSearchText.length) {
+                        originalEndIdx =
+                            originalIteratorIdx
+                    }
+                }
+
+                if (originalStartIdx != -1 && originalEndIdx != -1 && originalStartIdx < originalEndIdx) {
+                    addStyle(
+                        style = SpanStyle(background = MaterialTheme.colorScheme.primaryContainer),
+                        start = originalStartIdx,
+                        end = originalEndIdx
+                    )
+                }
+
+                searchStartInSpaceless =
+                    foundIdxInSpaceless + currentSearchText.length
+                if (searchStartInSpaceless <= foundIdxInSpaceless) {
+                    searchStartInSpaceless =
+                        foundIdxInSpaceless + 1
+                }
+            }
+        }
+    }
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -52,7 +135,7 @@ fun ToDoList(
             }
         )
         Text(
-            text = todo.description,
+            text = titleAnnotatedString,
             textAlign = TextAlign.Justify,
             style = MaterialTheme.typography.bodyMediumEmphasized,
             color = if (todo.isDone) Color.Gray else Color.Unspecified,
@@ -79,7 +162,7 @@ fun ToDoList(
         }
         IconButton(modifier = Modifier.weight(0.2f),
             onClick = {
-                onAction(OnToDoAction.Delete(todo))
+                onAction.invoke(OnToDoAction.Delete(todo))
             }
         ) {
             Icon(
@@ -97,7 +180,7 @@ fun ToDoList(
 fun ToDoListPreview() {
     val todo =
         ToDo(description = "Sample ToDo", lastUpdated = System.currentTimeMillis(), isDone = false)
-    ToDoList(todo = todo, onAction = {})
+    ToDoList(todo = todo, "", onAction = {})
 }
 
 
