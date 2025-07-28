@@ -122,7 +122,8 @@ fun ToDoList(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Checkbox(modifier = Modifier.weight(0.2f),
+        Checkbox(
+            modifier = Modifier.weight(0.2f),
             checked = todo.isDone,
             onCheckedChange = {
                 onAction(
@@ -145,7 +146,8 @@ fun ToDoList(
                 .padding(start = 8.dp)
         )
         AnimatedVisibility(!todo.isDone) {
-            IconButton(modifier = Modifier.weight(0.2f),
+            IconButton(
+                modifier = Modifier.weight(0.2f),
                 onClick = {
                     onAction(OnToDoAction.GetData(todo.id))
                     onAction(OnToDoAction.Edit(id = todo.id))
@@ -160,7 +162,8 @@ fun ToDoList(
         AnimatedVisibility(todo.isDone) {
             Spacer(modifier = Modifier.weight(0.2f))
         }
-        IconButton(modifier = Modifier.weight(0.2f),
+        IconButton(
+            modifier = Modifier.weight(0.2f),
             onClick = {
                 onAction.invoke(OnToDoAction.Delete(todo))
             }
