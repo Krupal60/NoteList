@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.note.list.ui.theme.NoteListTheme
@@ -111,9 +112,9 @@ fun MainContent() {
                 item(
                     selected = isSelected,
                     onClick = {
-                        if (currentBackStackEntry?.destination?.let { it.route == item.route } == false) {
+                        if (!isSelected) {
                             navController.navigate(item.route) {
-                                popUpTo(navController.graph.startDestinationId) {
+                                popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
                                 }
                                 launchSingleTop = true
