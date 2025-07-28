@@ -1,5 +1,6 @@
 package com.note.list.ui.view
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.WideNavigationRailDefaults
@@ -78,6 +80,7 @@ class MainActivity : ComponentActivity() {
 }
 
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MainContent() {
@@ -130,6 +133,8 @@ fun MainContent() {
             navigationDrawerContainerColor = MaterialTheme.colorScheme.surface
         )
     ) {
-        NavHost(navController)
+        Scaffold {
+            NavHost(navController)
+        }
     }
 }
