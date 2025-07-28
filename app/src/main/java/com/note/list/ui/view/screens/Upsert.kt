@@ -16,8 +16,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.NoteAdd
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.rounded.DeleteForever
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -138,28 +138,30 @@ fun Upsert(
             },
             title = {}
         )
-    }, floatingActionButtonPosition = FabPosition.EndOverlay, floatingActionButton = {
-        FloatingActionButtonMenu(expanded = fabMenuExpanded, button = {
-            ToggleFloatingActionButton(
-                modifier = Modifier.semantics {
-                    traversalIndex = -1f
-                    stateDescription = if (fabMenuExpanded) "Expanded" else "Collapsed"
-                },
-                checked = fabMenuExpanded,
-                onCheckedChange = { fabMenuExpanded = !fabMenuExpanded },
-            ) {
-                val imageVector by remember {
-                    derivedStateOf {
-                        if (fabMenuExpanded) Icons.Filled.Close else Icons.Filled.Add
+    }, floatingActionButtonPosition = FabPosition.End, floatingActionButton = {
+        FloatingActionButtonMenu(
+            expanded = fabMenuExpanded,
+            button = {
+                ToggleFloatingActionButton(
+                    modifier = Modifier.semantics {
+                        traversalIndex = -1f
+                        stateDescription = if (fabMenuExpanded) "Expanded" else "Collapsed"
+                    },
+                    checked = fabMenuExpanded,
+                    onCheckedChange = { fabMenuExpanded = !fabMenuExpanded },
+                ) {
+                    val imageVector by remember {
+                        derivedStateOf {
+                            if (fabMenuExpanded) Icons.Filled.Close else Icons.Filled.EditNote
+                        }
                     }
+                    Icon(
+                        painter = rememberVectorPainter(imageVector),
+                        contentDescription = null,
+                        modifier = Modifier.animateIcon({ checkedProgress }),
+                    )
                 }
-                Icon(
-                    painter = rememberVectorPainter(imageVector),
-                    contentDescription = null,
-                    modifier = Modifier.animateIcon({ checkedProgress }),
-                )
-            }
-        }) {
+            }) {
             items.forEachIndexed { i, item ->
                 FloatingActionButtonMenuItem(
                     modifier = Modifier.semantics {
