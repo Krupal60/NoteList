@@ -2,22 +2,31 @@ package com.note.list.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.note.list.data.repository.todo.ToDoListRepositoryImpl
 import com.note.list.domain.todo.OnToDoAction
 import com.note.list.domain.todo.ToDo
+import com.note.list.domain.todo.TodoRepository
 import com.note.list.ui.view.screens.ToDoState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ToDoListViewModel @Inject constructor(private val repository: ToDoListRepositoryImpl) :
+class ToDoListViewModel @Inject constructor(private val repository: TodoRepository) :
     ViewModel() {
 
-    val todo: Flow<Result<List<ToDo>>> = repository.getToDoListByNotDone()
-    val todoDone: Flow<Result<List<ToDo>>> = repository.getToDoListByDone()
+    val todo = repository.getToDoListByNotDone().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = Result.success(emptyList())
+    )
+    val todoDone = repository.getToDoListByDone().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = Result.success(emptyList())
+    )
 
     var state = MutableStateFlow(ToDoState())
         private set

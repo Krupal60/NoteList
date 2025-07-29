@@ -87,16 +87,8 @@ data class ToDoState(
 
 @Composable
 fun ToDoListScreenMain(viewModel: ToDoListViewModel = hiltViewModel()) {
-    val toDoList by viewModel.todo.collectAsStateWithLifecycle(
-        initialValue = Result.success(
-            emptyList()
-        )
-    )
-    val toDoListDone by viewModel.todoDone.collectAsStateWithLifecycle(
-        initialValue = Result.success(
-            emptyList()
-        )
-    )
+    val toDoList by viewModel.todo.collectAsStateWithLifecycle()
+    val toDoListDone by viewModel.todoDone.collectAsStateWithLifecycle()
     val state by viewModel.state.collectAsStateWithLifecycle()
     ToDoListScreen(toDoList, toDoListDone, state, viewModel::onAction)
 }

@@ -72,7 +72,7 @@ fun NoteScreenMain(
     viewModel: NoteViewModel = hiltViewModel()
 ) {
     val notes =
-        viewModel.notes.collectAsStateWithLifecycle(initialValue = Result.success(emptyList()))
+        viewModel.notes.collectAsStateWithLifecycle()
     NoteScreen(notes, onFloatButtonClick = {
         onFabClick(0)
     }, onItemClick = { id ->

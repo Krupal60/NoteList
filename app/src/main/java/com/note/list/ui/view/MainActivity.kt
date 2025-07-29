@@ -22,8 +22,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.WideNavigationRailDefaults
+import androidx.compose.material3.adaptive.WindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.derivedStateOf
@@ -38,7 +41,12 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.window.core.layout.WindowSizeClass
 import com.note.list.ui.theme.NoteListTheme
+import com.note.list.ui.view.components.HeightSizeClasses
+import com.note.list.ui.view.components.WidthSizeClasses
+import com.note.list.ui.view.components.minHeight
+import com.note.list.ui.view.components.minWidth
 import com.note.list.ui.view.navigation.NavHost
 import com.note.list.ui.view.navigation.RootScreen
 import com.note.list.viewmodel.MainViewModel
@@ -154,7 +162,23 @@ fun MainContent() {
         ?.firstOrNull { navDestination ->
             data.any { it.route == navDestination.route }
         }
+    val windowAdaptiveInfo = currentWindowAdaptiveInfo()
+    fun navigationSuiteType(adaptiveInfo: WindowAdaptiveInfo): NavigationSuiteType {
+        return with(adaptiveInfo) {
+            if (windowSizeClass.minWidth == WindowSizeClass.WidthSizeClasses.Compact) {
+                NavigationSuiteType.ShortNavigationBarMedium
+            } else if (
+                windowPosture.isTabletop ||
+                windowSizeClass.minHeight == WindowSizeClass.HeightSizeClasses.Compact
+            ) {
+                NavigationSuiteType.WideNavigationRailCollapsed
+            } else {
+                NavigationSuiteType.WideNavigationRailCollapsed
+            }
+        }
+    }
     NavigationSuiteScaffold(
+        layoutType = navigationSuiteType(windowAdaptiveInfo),
         modifier = Modifier.safeDrawingPadding(), navigationSuiteItems = {
             data.forEach { item ->
                 val isSelected = currentRootDestination?.route == item.route
