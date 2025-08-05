@@ -2,7 +2,7 @@
     android:width="108dp"
     android:height="108dp"
     android:autoMirrored="true"
-    android:tint="#FFF9E287"
+    android:tint="#FFFFFF"
     android:viewportWidth="24"
     android:viewportHeight="24">
     <group
