@@ -114,4 +114,6 @@ dependencies {
     implementation(libs.androidx.material3.adaptive.navigation.suite)
 
     implementation(libs.androidx.ui.text.google.fonts)
+    implementation(libs.app.update.ktx)
+    implementation(libs.review.ktx)
 }
