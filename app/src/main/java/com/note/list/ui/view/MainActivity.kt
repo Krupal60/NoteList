@@ -115,7 +115,7 @@ fun LazyStaggeredGridState.isScrollingUp(): Boolean {
 class MainActivity : ComponentActivity() {
 
     private val viewModel by viewModels<MainViewModel>()
-    private lateinit var appUpdateManager: AppUpdateManager
+    private val appUpdateManager: AppUpdateManager = AppUpdateManagerFactory.create(this)
     private val activityResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
             // handle callback
@@ -147,7 +147,6 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             val context = LocalContext.current
-            appUpdateManager = AppUpdateManagerFactory.create(context)
             val appUpdateInfoTask = appUpdateManager.appUpdateInfo
             appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
                 if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
