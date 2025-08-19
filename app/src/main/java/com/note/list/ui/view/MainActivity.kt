@@ -115,7 +115,7 @@ fun LazyStaggeredGridState.isScrollingUp(): Boolean {
 class MainActivity : ComponentActivity() {
 
     private val viewModel by viewModels<MainViewModel>()
-    private val appUpdateManager: AppUpdateManager = AppUpdateManagerFactory.create(this)
+    private lateinit var appUpdateManager: AppUpdateManager
     private val activityResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
             // handle callback
@@ -128,6 +128,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     override fun onCreate(savedInstanceState: Bundle?) {
+        appUpdateManager = AppUpdateManagerFactory.create(this)
         installSplashScreen().setKeepOnScreenCondition {
             viewModel.isLoading
         }
