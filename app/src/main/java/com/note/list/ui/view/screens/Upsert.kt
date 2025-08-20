@@ -94,9 +94,15 @@ fun UpsertMain(
     navController: NavHostController, viewModel: UpsertViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val id = viewModel.id
 
     Upsert(
-        navController, state, viewModel::onAction, viewModel::onTitleChange, viewModel::onTextChange
+        navController = navController,
+        state = state,
+        id = id,
+        onAction = viewModel::onAction,
+        onTitleChange = viewModel::onTitleChange,
+        onTextChange = viewModel::onTextChange
     )
 }
 
@@ -107,16 +113,16 @@ fun Upsert(
     state: UpsertState,
     onAction: (OnNoteUpsertAction) -> Unit,
     onTitleChange: (String) -> Unit,
-    onTextChange: (String) -> Unit
+    onTextChange: (String) -> Unit,
+    id: Int?
 ) {
     DisposableEffect(Unit) {
         onDispose {
             onAction(OnNoteUpsertAction.NoteUpsert)
         }
     }
-    val title by rememberUpdatedState(state.title)
-    val description by rememberUpdatedState(state.description)
-    val items = if (title.isNotEmpty() || description.isNotEmpty()) {
+    val id by rememberUpdatedState(id)
+    val items = if (id != -1 && id != null) {
         listOf(
             Icons.Rounded.DeleteForever to "Delete Note",
             Icons.Rounded.Save to "Save Note",
@@ -153,7 +159,7 @@ fun Upsert(
                     }) {
                         Icon(Icons.Rounded.Save, contentDescription = "Save Note")
                     }
-                    if (title.isNotEmpty() || description.isNotEmpty()) {
+                    if (id != -1 && id != null) {
                         IconButton(onClick = {
                             onAction(OnNoteUpsertAction.Delete)
                             navController.navigateUp()
@@ -464,5 +470,7 @@ fun UpsertPreview() {
         state = state,
         onAction = {},
         onTitleChange = {},
-        onTextChange = {})
+        onTextChange = {},
+        id = 0,
+    )
 }

@@ -66,7 +66,7 @@ fun NavGraphBuilder.noteNavGraph(navController: NavHostController) {
                     popUpTo(NoteScreen.Notes.route)
                 }
             }, onFabClick = {
-                navController.navigate(NoteScreen.Upsert.route + "/0") {
+                navController.navigate(NoteScreen.Upsert.route + "/-1") {
                     launchSingleTop = true
                     restoreState = true
                     popUpTo(NoteScreen.Notes.route)
@@ -75,7 +75,7 @@ fun NavGraphBuilder.noteNavGraph(navController: NavHostController) {
         }
         composable(
             NoteScreen.Upsert.route + "/{id}", arguments = listOf(navArgument("id") {
-                defaultValue = 0
+                defaultValue = -1
                 type = NavType.IntType
             })
         ) {

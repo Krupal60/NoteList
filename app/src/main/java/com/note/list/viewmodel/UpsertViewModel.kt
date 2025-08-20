@@ -31,7 +31,7 @@ class UpsertViewModel @Inject constructor(
 
     private fun getData() {
         viewModelScope.launch {
-            if (id != null) {
+            if (id != -1 && id != null) {
                 repository.getNotesDetail(id).collect { resultData ->
                     resultData.map {
                         result = it
