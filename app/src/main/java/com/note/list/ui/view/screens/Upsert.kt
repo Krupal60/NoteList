@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -44,6 +46,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,6 +62,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
@@ -137,8 +141,9 @@ fun Upsert(
     val isLandscape = with(windowAdaptiveInfo) {
         windowSizeClass.minHeight == WindowSizeClass.HeightSizeClasses.Compact
     }
+    val isKeyboardOpen by keyboardAsState()
 
-    BackHandler(fabMenuExpanded && !isLandscape) { fabMenuExpanded = false }
+    BackHandler(fabMenuExpanded && (!isLandscape && !isKeyboardOpen)) { fabMenuExpanded = false }
 
     Scaffold(topBar = {
         TopAppBar(navigationIcon = {
@@ -151,14 +156,8 @@ fun Upsert(
                 )
             }
         }, title = {}, actions = {
-            AnimatedVisibility(isLandscape) {
+            AnimatedVisibility(isLandscape || isKeyboardOpen) {
                 Row {
-                    IconButton(onClick = {
-                        onAction(OnNoteUpsertAction.NoteUpsert)
-                        navController.navigateUp()
-                    }) {
-                        Icon(Icons.Rounded.Save, contentDescription = "Save Note")
-                    }
                     if (id != -1 && id != null) {
                         IconButton(onClick = {
                             onAction(OnNoteUpsertAction.Delete)
@@ -170,13 +169,19 @@ fun Upsert(
                             )
                         }
                     }
+                    IconButton(onClick = {
+                        onAction(OnNoteUpsertAction.NoteUpsert)
+                        navController.navigateUp()
+                    }) {
+                        Icon(Icons.Rounded.Save, contentDescription = "Save Note")
+                    }
                 }
             }
         })
     }, floatingActionButtonPosition = FabPosition.End, floatingActionButton = {
         FloatingActionButtonMenu(
             modifier = Modifier.animateFloatingActionButton(
-                !isLandscape, Alignment.BottomEnd
+                !isLandscape && !isKeyboardOpen, Alignment.BottomEnd
             ), expanded = fabMenuExpanded, button = {
                 ToggleFloatingActionButton(
                     modifier = Modifier.semantics {
@@ -409,7 +414,6 @@ fun Upsert(
                                 .padding(
                                     top = 12.dp
                                 )
-                                .padding(bottom = 100.dp)
                                 .shadow(1.dp, RoundedCornerShape(10.dp)),
                             textStyle = MaterialTheme.typography.bodyLargeEmphasized.copy(
                                 color = MaterialTheme.colorScheme.onSurface,
@@ -473,4 +477,10 @@ fun UpsertPreview() {
         onTextChange = {},
         id = 0,
     )
+}
+
+@Composable
+fun keyboardAsState(): State<Boolean> {
+    val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+    return rememberUpdatedState(isImeVisible)
 }
